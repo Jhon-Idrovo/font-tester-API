@@ -147,7 +147,8 @@ export async function signUpHandler(
   const { username, password, email } = req.body;
   try {
     //we could hardcode the role's id but if it gets deleted/modified we would have a problem
-    const userRole = await Role.findOne({ name: "User" });
+    //use "Guest" until the payment is made
+    const userRole = await Role.findOne({ name: "Guest" });
     const user = await new User({
       username,
       email,

@@ -8,6 +8,8 @@ const userSchema = new Schema<UserIfc, UserModel>({
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   role: { ref: "Role", type: Schema.Types.ObjectId, require: true },
+  likedFonts: { ref: "Font", type: Schema.Types.ObjectId },
+  unlikedFonts: { ref: "Font", type: Schema.Types.ObjectId },
 });
 
 /**
