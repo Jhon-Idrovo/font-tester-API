@@ -5,9 +5,12 @@ import dotenv from "dotenv";
 import initializeRoles from "../utils/initializeRoles";
 import { initDatabaseConnection } from "./database";
 //load enviroment variables. This must be done before initializing the database
-dotenv.config();
+const a = dotenv.config();
+a ? console.log("Enviroment variables loaded") : console.log(a);
 
-import app from "./app";
+import app from "../routes/app";
+//run passport
+import "./passport";
 
 async function initServer() {
   await initDatabaseConnection();

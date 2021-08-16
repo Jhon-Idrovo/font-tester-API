@@ -2,10 +2,12 @@ import { model, Schema } from "mongoose";
 import { UserIfc, UserModel } from "./interfaces/users";
 import bcrypt from "bcryptjs";
 const userSchema = new Schema<UserIfc, UserModel>({
-  username: { type: String, required: true, unique: true },
+  authMethod: String,
+  authProviderId: { type: String, require: false },
+  username: { type: String, required: true, unique: false },
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  roles: [{ ref: "Role", type: Schema.Types.ObjectId }],
+  role: { ref: "Role", type: Schema.Types.ObjectId, require: true },
 });
 
 /**

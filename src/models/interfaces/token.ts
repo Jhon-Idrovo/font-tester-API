@@ -10,5 +10,5 @@ export declare interface BlacklistedTokenInterface {
 //for the payload being sent into the token
 export declare interface TokenPayloadInterface extends JwtPayload {
   userID: string;
-  roles: RoleName[];
+  role: RoleName;
 }

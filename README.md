@@ -1,5 +1,14 @@
-##THIS TEMPLATE COUNTS WITH
+## THIS TEMPLATE COUNTS WITH
 
+# CONFIGURE GOOGLE OAuth
+
+- Read https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid?authuser=1
+- use the enviroment variables
+GOOGLE_CLIENT_ID = id 
+GOOGLE_CLIENT_SECRET = secret
+
+
+## CHARACTERISTICS
 - Users with
   - Roles
   - Authentication through password
