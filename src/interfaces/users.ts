@@ -9,6 +9,7 @@ export declare interface UserIfc {
   email: string;
   role: { name: RoleName; _id: string };
   comparePassword: Function;
+  stripeID?: string;
 }
 
 export declare interface UserModel extends Model<UserIfc> {

@@ -1,5 +1,5 @@
 import { model, Schema, Types } from "mongoose";
-import { BlacklistedTokenInterface } from "./interfaces/token";
+import { BlacklistedTokenInterface } from "../interfaces/token";
 
 const blacklistedTokenSchema = new Schema<BlacklistedTokenInterface>({
   token: String,

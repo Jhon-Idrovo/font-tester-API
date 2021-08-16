@@ -1,6 +1,6 @@
 import jwt, { Secret } from "jsonwebtoken";
-import { RoleName } from "../models/interfaces/roles";
-import { TokenPayloadInterface } from "../models/interfaces/token";
+import { RoleName } from "../interfaces/roles";
+import { TokenPayloadInterface } from "../interfaces/token";
 import { accessTokenLifetime, refreshTokenLifetime } from "../config/config";
 /**
  *

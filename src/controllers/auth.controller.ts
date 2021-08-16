@@ -12,7 +12,7 @@ import {
   verifyToken,
 } from "../utils/tokens";
 import passport from "passport";
-import { UserIfc } from "../models/interfaces/users";
+import { UserIfc } from "../interfaces/users";
 import { Document } from "mongoose";
 
 /**
