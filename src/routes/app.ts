@@ -6,6 +6,7 @@ import cors from "cors";
 import morgan from "morgan";
 
 import authRouter from "./auth.routes";
+import tokenRouter from "./token.routes";
 import userRouter from "./user.routes";
 import subscriptionRouter from "./subscription.routes";
 
@@ -21,6 +22,7 @@ app.use(morgan("dev"));
 app.use(passport.initialize());
 
 app.use(`${basePath}/auth`, authRouter);
+app.use(`${basePath}/tokens`, tokenRouter);
 app.use(`${basePath}/users`, userRouter);
 app.use(`${basePath}/subscriptions`, subscriptionRouter);
 

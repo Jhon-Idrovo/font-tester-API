@@ -13,13 +13,13 @@ export function verifyTokenMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const token = req.headers.authorization;
+  const token = req.headers.Authorization;
   const payload = token ? verifyToken(token as string) : false;
-  console.log(token, payload);
+  console.log(token, payload, req.headers);
 
   if (payload) {
     req.body.decodedtToken = payload;
     return next();
   }
-  return res.status(401).json({ error: "Authorization failed" });
+  return res.status(401).json({ error: { message: "Authorization failed" } });
 }

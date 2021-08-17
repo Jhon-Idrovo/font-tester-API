@@ -5,7 +5,7 @@
 import { NextFunction, Request, Response } from "express";
 import Role from "../models/Role";
 import User from "../models/User";
-import BlacklistedToken from "../models/Token";
+import BlacklistedToken from "../models/BlacklistedToken";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -75,52 +75,6 @@ export async function signInHandler(
 }
 
 /**
- * Takes in a refresh token and sends back a new access token if the
- * first is valid.
- * @param req
- * @param res
- * @param next
- */
-export async function getAccessTokenHandler(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const refreshToken = req.headers.authorization;
-  if (refreshToken) {
-    //validate the refresh token
-    //first validation
-    const decoded = verifyToken(refreshToken as string);
-
-    if (decoded) {
-      //second validation: See if the token is blacklisted
-      const dbToken = await BlacklistedToken.findOne({
-        token: refreshToken as string,
-      }).catch(() => null);
-      /**a third validation could be neccesary to verify that the user requesting the
-       * new token is the same as the user registered in it. This is important since
-       * the autorization middleware uses that information to identify the user.
-       * A user cannot use its refresh token to request an access token for another
-       * client since we return the latter with the same userID.
-       */
-      if (!dbToken) {
-        //send another acces token to the client
-        return res.status(200).json({
-          accessToken: generateAccessToken(
-            decoded.userID,
-            decoded.role,
-            decoded.email,
-            decoded.name
-          ),
-        });
-      }
-    }
-    //the token is expired or blacklisted
-    return res.json({ error: "Invalid refresh token" });
-  }
-}
-
-/**
  * Deletes the refresh token from the database and invalidates the access token.
  * This method is optional since deleting the tokens on the client logs out
  * succesfully. This method is more needed when someone steals a refresh token.
@@ -163,8 +117,6 @@ export async function signUpHandler(
   res: Response,
   next: NextFunction
 ) {
-  console.log(req.body);
-
   const { username, password, email } = req.body;
   try {
     //we could hardcode the role's id but if it gets deleted/modified we would have a problem
@@ -177,7 +129,7 @@ export async function signUpHandler(
       password: await User.encryptPassword(password),
       role: userRole?._id,
     }).save();
-    user.populate("role");
+    await user.populate("role", "name -_id").execPopulate();
     const newRole = user.role.name;
     const refreshToken = generateRefreshToken(
       user._id,
