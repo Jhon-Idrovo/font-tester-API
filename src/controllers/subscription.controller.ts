@@ -23,18 +23,24 @@ export async function createElementsSubscription(
 ) {
   const { priceID, paymentMethod } = req.body;
   const { userID } = (req as RequestEnhanced).decodedToken;
+  //we can only call this route if the user is logged in
   const user = await User.findById(userID).exec();
-  //create customer. We need to save it's id to the database
-  const customer = await stripe.customers.create({ email: user?.email });
-  //attach the payment method to the customer
-  await stripe.paymentMethods.attach(paymentMethod, { customer: customer.id });
-  //set the default payment method
-  await stripe.customers.update(customer.id, {
-    invoice_settings: { default_payment_method: paymentMethod },
-  });
-
-  //create subscription
   try {
+    //create customer. We need to save it's id to the database
+    const customer = await stripe.customers.create({ email: user?.email });
+    //attach the user's _id to the stripe customer. This help us later for retrieving
+    //the user on webhooks
+    customer.metadata._id = user?._id;
+    //attach the payment method to the customer
+    await stripe.paymentMethods.attach(paymentMethod, {
+      customer: customer.id,
+    });
+    //set the default payment method
+    await stripe.customers.update(customer.id, {
+      invoice_settings: { default_payment_method: paymentMethod },
+    });
+
+    //create subscription
     // Note we're expanding the Subscription's
     // latest invoice and that invoice's payment_intent
     // so we can pass it to the front end to confirm the payment

@@ -34,13 +34,25 @@ export async function signInHandler(
     const { email, password } = req.body;
     const user = await User.findOne({ email }).populate("role").exec();
     if (user) {
+      console.log(user);
+
       //compare passwords
       if (await user.comparePassword(user.password, password)) {
         const userRole = user.role.name;
 
-        const refreshToken = generateRefreshToken(user._id, userRole);
+        const refreshToken = generateRefreshToken(
+          user._id,
+          userRole,
+          user.email,
+          user.username
+        );
         return res.status(200).json({
-          accessToken: generateAccessToken(user._id, userRole),
+          accessToken: generateAccessToken(
+            user._id,
+            userRole,
+            user.email,
+            user.username
+          ),
           refreshToken,
           //this is optional, you should not rely on this to grant access to any
           //protected resorce on the client because it's easy to modify.
@@ -49,12 +61,16 @@ export async function signInHandler(
           //role: userRole,
         });
       } else {
-        return res.status(400).json({ error: "Invalid password", token: null });
+        return res
+          .status(400)
+          .json({ error: { message: "Invalid password" }, token: null });
       }
     }
-    return res.status(400).json({ error: "User not found" });
+    return res.status(400).json({ error: { message: "User not found" } });
   } catch (error) {
-    return res.status(400).json({ error: (error as Error).message });
+    return res
+      .status(400)
+      .json({ error: { message: (error as Error).message } });
   }
 }
 
@@ -90,7 +106,12 @@ export async function getAccessTokenHandler(
       if (!dbToken) {
         //send another acces token to the client
         return res.status(200).json({
-          accessToken: generateAccessToken(decoded.userID, decoded.role),
+          accessToken: generateAccessToken(
+            decoded.userID,
+            decoded.role,
+            decoded.email,
+            decoded.name
+          ),
         });
       }
     }
@@ -158,9 +179,19 @@ export async function signUpHandler(
     }).save();
     user.populate("role");
     const newRole = user.role.name;
-    const refreshToken = generateRefreshToken(user._id, newRole);
+    const refreshToken = generateRefreshToken(
+      user._id,
+      newRole,
+      user.email,
+      user.username
+    );
     return res.status(201).json({
-      accessToken: generateAccessToken(user._id, newRole),
+      accessToken: generateAccessToken(
+        user._id,
+        newRole,
+        user.email,
+        user.username
+      ),
       refreshToken,
       user,
     });
@@ -221,9 +252,14 @@ export async function createAdminHandler(
         role: adminRole?._id,
       }).save();
 
-      return res
-        .status(201)
-        .json({ accessToken: generateAccessToken(admin._id, "Admin") });
+      return res.status(201).json({
+        accessToken: generateAccessToken(
+          admin._id,
+          "Admin",
+          admin.email,
+          admin.email
+        ),
+      });
     }
     res.json({ error: "Admin access password invalid" });
   } catch (error) {
@@ -261,8 +297,18 @@ export async function handleGoogle(
       console.log(err, user, userInfo);
       //role are populated
       const role = user.role.name;
-      const accesToken = generateAccessToken(user._id, role);
-      const refreshToken = generateRefreshToken(user._id, role);
+      const accesToken = generateAccessToken(
+        user._id,
+        role,
+        user.email,
+        user.username
+      );
+      const refreshToken = generateRefreshToken(
+        user._id,
+        role,
+        user.email,
+        user.username
+      );
       console.log("redirecting");
 
       return res.redirect(

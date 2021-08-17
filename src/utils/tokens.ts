@@ -7,9 +7,14 @@ import { accessTokenLifetime, refreshTokenLifetime } from "../config/config";
  * @param userID the generated user id
  * @returns jwt access token with user roles and id as payload
  */
-export function generateAccessToken(userID: string, role: RoleName) {
+export function generateAccessToken(
+  userID: string,
+  role: RoleName,
+  email: string,
+  name: string
+) {
   return jwt.sign(
-    { userID, role } as TokenPayloadInterface,
+    { userID, role, email, name } as TokenPayloadInterface,
     process.env.JWT_TOKEN_SECRET as Secret,
     {
       expiresIn: accessTokenLifetime,
@@ -35,9 +40,14 @@ export function verifyToken(token: string) {
  * @param roles to be send as payload
  * @returns a JWT token. Expiration time determined by the configuration file.
  */
-export function generateRefreshToken(userID: string, role: RoleName) {
+export function generateRefreshToken(
+  userID: string,
+  role: RoleName,
+  email: string,
+  name: string
+) {
   return jwt.sign(
-    { userID, role } as TokenPayloadInterface,
+    { userID, role, email, name } as TokenPayloadInterface,
     process.env.JWT_TOKEN_SECRET as Secret,
     {
       expiresIn: refreshTokenLifetime,
