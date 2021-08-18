@@ -21,16 +21,18 @@ export async function createElementsSubscription(
   res: Response,
   next: NextFunction
 ) {
-  const { priceID, paymentMethod } = req.body;
+  const { priceId, paymentMethod } = req.body;
   const { userID } = (req as RequestEnhanced).decodedToken;
   //we can only call this route if the user is logged in
   const user = await User.findById(userID).exec();
+  if (!user)
+    return res.status(400).json({ error: { message: "User not found" } });
   try {
     //create customer. We need to save it's id to the database
-    const customer = await stripe.customers.create({ email: user?.email });
+    const customer = await stripe.customers.create({ email: user.email });
     //attach the user's _id to the stripe customer. This help us later for retrieving
     //the user on webhooks
-    customer.metadata._id = user?._id;
+    customer.metadata._id = user._id;
     //attach the payment method to the customer
     await stripe.paymentMethods.attach(paymentMethod, {
       customer: customer.id,
@@ -48,22 +50,32 @@ export async function createElementsSubscription(
       customer: customer.id,
       items: [
         {
-          price: priceID,
+          price: priceId,
         },
       ],
       payment_behavior: "default_incomplete",
       expand: ["latest_invoice.payment_intent"],
     });
     //save the customer id to the database
-    await user?.update({ stripeID: subscription.id }).exec();
+    user.stripeID = customer.id;
+    await user.save();
     //stripe will try to make the transaction with the payment method provided previously
     const invoice = subscription.latest_invoice as Stripe.Invoice;
     const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+    console.log(
+      "Subscription:",
+      subscription,
+      "Customer:",
+      customer,
+      "USER:",
+      user
+    );
 
     res.send({
-      paymentIntent,
+      payment_intent: paymentIntent,
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).send({ error: { message: error.message } });
   }
 }
