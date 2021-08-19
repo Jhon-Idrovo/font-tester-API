@@ -1,5 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import BlacklistedToken from "../models/BlacklistedToken";
+import User from "../models/User";
 import router from "../routes/auth.routes";
 import { generateAccessToken, verifyToken } from "../utils/tokens";
 /**
@@ -36,14 +37,17 @@ export async function getAccessTokenHandler(
        * client since we return the latter with the same userID.
        */
       if (!dbToken) {
-        //DO NOT USE THE SAME PAYLOAD TO THE NEW TOKEN. MAKES IMPOSSIBLE UPDATES
         //send another acces token to the client
+        const user = await User.findById(decoded.userID);
+        if (!user)
+          return res.status(400).json({ error: { message: "User not found" } });
+        await user.populate("role").execPopulate();
         return res.status(200).json({
           accessToken: generateAccessToken(
-            decoded.userID,
-            decoded.role,
-            decoded.email,
-            decoded.name
+            user._id,
+            user.role.name,
+            user.email,
+            user.username
           ),
         });
       }
