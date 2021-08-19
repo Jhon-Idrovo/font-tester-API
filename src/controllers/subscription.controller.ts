@@ -3,7 +3,7 @@ import { stripe } from "../config/stripe";
 import { RequestEnhanced } from "../interfaces/utils";
 import User from "../models/User";
 import Stripe from "stripe";
-import { TokenPayloadInterface } from "../interfaces/token";
+import { getOrCreateCustomer } from "../utils/stripe";
 
 /**
  * At this point the user is authenticated and it's information is
@@ -21,18 +21,19 @@ export async function createElementsSubscription(
   res: Response,
   next: NextFunction
 ) {
+  console.log(
+    "-----------------------CREATING SUBSCRIPTION--------------------------"
+  );
+
   const { priceId, paymentMethod } = req.body;
   const { userID } = (req as RequestEnhanced).decodedToken;
   //we can only call this route if the user is logged in
   const user = await User.findById(userID).exec();
+
   if (!user)
     return res.status(400).json({ error: { message: "User not found" } });
   try {
-    //create customer. We need to save it's id to the database
-    const customer = await stripe.customers.create({ email: user.email });
-    //attach the user's _id to the stripe customer. This help us later for retrieving
-    //the user on webhooks
-    customer.metadata._id = user._id;
+    const customer = await getOrCreateCustomer(user);
     //attach the payment method to the customer
     await stripe.paymentMethods.attach(paymentMethod, {
       customer: customer.id,
@@ -56,18 +57,15 @@ export async function createElementsSubscription(
       payment_behavior: "default_incomplete",
       expand: ["latest_invoice.payment_intent"],
     });
-    //save the customer id to the database
-    user.stripeID = customer.id;
-    await user.save();
     //stripe will try to make the transaction with the payment method provided previously
     const invoice = subscription.latest_invoice as Stripe.Invoice;
     const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
     console.log(
-      "Subscription:",
+      "-----------Subscription:",
       subscription,
-      "Customer:",
+      "----------Customer:",
       customer,
-      "USER:",
+      "--------USER:",
       user
     );
 
@@ -75,7 +73,7 @@ export async function createElementsSubscription(
       payment_intent: paymentIntent,
     });
   } catch (error) {
-    console.log(error);
+    console.log("-------------------ERROR CREATING SUBSCRIPTION: ", error);
     return res.status(400).send({ error: { message: error.message } });
   }
 }

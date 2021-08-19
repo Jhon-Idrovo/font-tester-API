@@ -29,6 +29,8 @@ export async function signInHandler(
   res: Response,
   next: NextFunction
 ) {
+  console.log("----------------------SIGN IN--------------------------------");
+
   try {
     //use email because the username is not unique when using OAuth providers
     const { email, password } = req.body;

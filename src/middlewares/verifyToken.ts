@@ -16,7 +16,9 @@ export function verifyTokenMiddleware(
 ) {
   const token = (req.headers.authorization as string).split(" ")[1];
   const payload = token ? verifyToken(token as string) : false;
-  console.log("TOKEN VERIFICATION: ", token, payload, req.headers);
+  console.log(
+    "-----------------------TOKEN VERIFICATION----------------------- "
+  );
 
   if (payload) {
     (req as RequestEnhanced).decodedToken = payload;

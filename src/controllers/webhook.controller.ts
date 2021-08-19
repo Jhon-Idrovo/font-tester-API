@@ -19,7 +19,9 @@ export async function handleWebHook(
   res: Response,
   next: NextFunction
 ) {
-  console.log(req);
+  console.log(
+    "---------------------------HANDLING WEBHOOK--------------------------------"
+  );
 
   // Retrieve the event by verifying the signature using the raw body and secret.
   let event: Stripe.Event;
@@ -37,25 +39,41 @@ export async function handleWebHook(
     return res.sendStatus(400);
   }
   // Extract the object from the event.
-  const dataObject = event.data.object as Stripe.Invoice;
+  const dataObject = event.data.object as Stripe.PaymentIntent;
+  console.log(dataObject);
 
-  // Retrieve the customer
-  const customer = (await stripe.customers.retrieve(
-    dataObject.customer as string
-  )) as Stripe.Customer;
+  // Retrieve the customer and user. If performence is needed put these calls on a single promise
+  const customer = (await stripe.customers
+    .retrieve(dataObject.customer as string)
+    .catch((err) => null)) as Stripe.Customer;
+  console.log(customer);
+
+  if (!customer)
+    return res.status(400).json({ error: { message: "No customer found" } });
+  //we can use the email too since it's unique
+  const user = await User.findById(customer.metadata._id);
+  if (!user)
+    return res.status(400).json({ error: { message: "No user found" } });
   // Handle the event type
   // Review important events for Billing webhooks
   // https://stripe.com/docs/billing/webhooks
   // Remove comment to see the various objects sent for this sample
+  console.log(event.type);
+
   switch (event.type) {
-    case "invoce.payment_succeeded":
+    case "invoice.payment_succeeded":
       console.log("--------PAYMENT SUCCEEDED------");
       //first payment succeeded, provision the subscription updating the user role
-      const role = await Role.findOne({ name: "User" }).exec();
-      const user = await User.findByIdAndUpdate(customer.metadata._id, {
-        stripeID: customer.id,
-        role: role?._id,
-      });
+      const userRole = await Role.findOne({ name: "User" }).exec();
+      if (!userRole)
+        return res.status(400).json({ error: { message: "Role not found" } });
+      user.role = userRole._id;
+      user.stripeID = customer.id;
+      const a = await user.save().catch((err) => null);
+      if (!a)
+        return res.status(400).json({
+          error: { message: "Error updating the user role and stripeID" },
+        });
       return res.send({ received: true });
     case "invoice.paid":
       // Continue to provision the subscription as payments continue to be made.
@@ -68,8 +86,16 @@ export async function handleWebHook(
       // Use this webhook to notify your user that their payment has
       // failed and to retrieve new card details.
       console.log("--------PAYMENT FAILED------");
-      //the user already has the role of "Guest".
-      //send him an email?
+      //recurrent payment failed
+      const pastDueRole = await Role.findOne({ name: "User-PastDue" }).exec();
+      if (!pastDueRole)
+        return res.status(400).json({ error: { message: "Role not found" } });
+      user.role = pastDueRole._id;
+      const b = await user.save().catch(() => null);
+      if (b)
+        return res
+          .status(400)
+          .json({ error: { message: "Error updating the user role" } });
       break;
     case "customer.subscription.deleted":
       if (event.request != null) {

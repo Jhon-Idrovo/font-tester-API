@@ -18,7 +18,7 @@ export async function getAccessTokenHandler(
   res: Response,
   next: NextFunction
 ) {
-  const refreshToken = req.body.refresh;
+  const refreshToken = req.body.refreshToken;
   if (refreshToken) {
     //validate the refresh token
     //first validation
@@ -36,6 +36,7 @@ export async function getAccessTokenHandler(
        * client since we return the latter with the same userID.
        */
       if (!dbToken) {
+        //DO NOT USE THE SAME PAYLOAD TO THE NEW TOKEN. MAKES IMPOSSIBLE UPDATES
         //send another acces token to the client
         return res.status(200).json({
           accessToken: generateAccessToken(

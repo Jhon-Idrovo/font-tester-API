@@ -4,11 +4,11 @@
 
 - Read https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid?authuser=1
 - use the enviroment variables
-GOOGLE_CLIENT_ID = id 
-GOOGLE_CLIENT_SECRET = secret
-
+  GOOGLE_CLIENT_ID = id
+  GOOGLE_CLIENT_SECRET = secret
 
 ## CHARACTERISTICS
+
 - Users with
   - Roles
   - Authentication through password
@@ -29,3 +29,4 @@ If an access or refresh token is stolen we can't verify that the user sending th
 TODO
 
 - Set error messages on auth responses. They should be ready for being displayed on the client directly.
+- create the getOrCreateCustomer method

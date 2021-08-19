@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { handleWebHook } from "../controllers/webhook.controller";m '../controllers/webhook.controller'
-const router = Router()
+import { handleWebHook } from "../controllers/webhook.controller";
+const router = Router();
 
-router.post('/webhook', handleWebHook )
+router.post("/", handleWebHook);
+
+export default router;
