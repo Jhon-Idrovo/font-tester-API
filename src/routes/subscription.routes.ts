@@ -5,5 +5,5 @@ const router = Router();
 router.use(verifyTokenMiddleware);
 router.get("/", SubscriptionCtlr.listSubscriptions);
 router.post("/create", SubscriptionCtlr.createElementsSubscription);
-router.post("/delete", SubscriptionCtlr.cancelSubscription);
+router.post("/cancel", SubscriptionCtlr.cancelSubscription);
 export default router;

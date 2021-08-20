@@ -77,7 +77,14 @@ export async function createElementsSubscription(
     });
   } catch (error) {
     console.log("-------------------ERROR CREATING SUBSCRIPTION: ", error);
-    return res.status(400).send({ error: { message: error.message } });
+    return res
+      .status(400)
+      .send({
+        error: {
+          message: "Error creating subscription, please try again.",
+          complete: error,
+        },
+      });
   }
 }
 /**

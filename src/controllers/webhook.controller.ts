@@ -125,6 +125,8 @@ export async function handleWebHook(
         // upon your subscription settings.
       }
       const guestRole = await Role.findOne({ name: "Guest" }).exec();
+      console.log(guestRole);
+
       if (!guestRole)
         return res
           .status(400)
@@ -132,7 +134,9 @@ export async function handleWebHook(
       user.role = guestRole._id;
 
       const c = await user.save().catch(() => null);
-      if (c)
+      console.log(c);
+
+      if (!c)
         return res
           .status(400)
           .json({ error: { message: "Error updating the user role" } });
