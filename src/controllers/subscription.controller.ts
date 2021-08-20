@@ -103,12 +103,21 @@ export async function listSubscriptions(
   return res.json({ ...subscriptions });
 }
 
+/**
+ * Given the subscriptionId in the body, cancel the subscription
+ * @param req
+ * @param res
+ * @param next
+ * @returns Status code
+ */
 export async function cancelSubscription(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   //const { userID } = (req as RequestEnhanced).decodedToken;
-  const deleted = await stripe.subscriptions.del(req.body.subscriptionId);
-  return res.send();
+  const deleted = await stripe.subscriptions
+    .del(req.body.subscriptionId)
+    .catch((err) => null);
+  return deleted ? res.send() : res.status(400).send();
 }

@@ -84,21 +84,25 @@ export async function handleWebHook(
       // This is snother way to handle the first payment
       break;
     case "invoice.payment_failed":
+      // HANDLED BY STRIPE. If after 4 retries the payment isn't made,
+      // stripe will cancel the supscription and an customer.subscription.deleted
+      // event will be issued.
+
       // If the payment fails or the customer does not have a valid payment method,
       //  an invoice.payment_failed event is sent, the subscription becomes past_due.
       // Use this webhook to notify your user that their payment has
       // failed and to retrieve new card details.
-      console.log("--------PAYMENT FAILED------");
-      //If this is the first time, this is handled on the frontend
-      if (user.stripeID) {
-        // Recurrent payment failed by 3D secure
-        if (dataObject.status === "requires_action") {
-          // Send email notification of why the account was downgraded
-          // Can this be done from the dashboard?
-        }
-        if (dataObject.status === "requires_payment_method") {
-        }
-      }
+      // console.log("--------PAYMENT FAILED------");
+      // //If this is the first time, this is handled on the frontend
+      // if (user.stripeID) {
+      //   // Recurrent payment failed by 3D secure
+      //   if (dataObject.status === "requires_action") {
+      //     // Send email notification of why the account was downgraded
+      //     // Can this be done from the dashboard?
+      //   }
+      //   if (dataObject.status === "requires_payment_method") {
+      //   }
+      // }
       //recurrent payment failed
       // const pastDueRole = await Role.findOne({ name: "User-PastDue" }).exec();
       // if (!pastDueRole)
@@ -126,6 +130,7 @@ export async function handleWebHook(
           .status(400)
           .json({ error: { message: "Guest role not found" } });
       user.role = guestRole._id;
+
       const c = await user.save().catch(() => null);
       if (c)
         return res
