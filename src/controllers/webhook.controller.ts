@@ -51,7 +51,7 @@ export async function handleWebHook(
   if (!customer)
     return res.status(400).json({ error: { message: "No customer found" } });
   //we can use the email too since it's unique
-  const user = await User.findById(customer.metadata._id);
+  const user = await User.findById(customer.metadata._id).populate("role");
   if (!user)
     return res.status(400).json({ error: { message: "No user found" } });
   // Handle the event type
@@ -63,6 +63,8 @@ export async function handleWebHook(
   switch (event.type) {
     case "invoice.payment_succeeded":
       console.log("--------PAYMENT SUCCEEDED------");
+      // This is trigered also when a recurring payment is made
+      if (user.role.name === "User") return res.send({ received: true });
       //first payment succeeded, provision the subscription updating the user role
       const userRole = await Role.findOne({ name: "User" }).exec();
       if (!userRole)
@@ -78,7 +80,8 @@ export async function handleWebHook(
     case "invoice.paid":
       // Continue to provision the subscription as payments continue to be made.
       // Used to provision services after the trial has ended.
-      // The status of the invoice will show up as paid. Store the status in your
+      // The status of the invoice will show up as paid.
+      // This is snother way to handle the first payment
       break;
     case "invoice.payment_failed":
       // If the payment fails or the customer does not have a valid payment method,
@@ -86,18 +89,30 @@ export async function handleWebHook(
       // Use this webhook to notify your user that their payment has
       // failed and to retrieve new card details.
       console.log("--------PAYMENT FAILED------");
+      //If this is the first time, this is handled on the frontend
+      if (user.stripeID) {
+        // Recurrent payment failed by 3D secure
+        if (dataObject.status === "requires_action") {
+          // Send email notification of why the account was downgraded
+          // Can this be done from the dashboard?
+        }
+        if (dataObject.status === "requires_payment_method") {
+        }
+      }
       //recurrent payment failed
-      const pastDueRole = await Role.findOne({ name: "User-PastDue" }).exec();
-      if (!pastDueRole)
-        return res.status(400).json({ error: { message: "Role not found" } });
-      user.role = pastDueRole._id;
-      const b = await user.save().catch(() => null);
-      if (b)
-        return res
-          .status(400)
-          .json({ error: { message: "Error updating the user role" } });
+      // const pastDueRole = await Role.findOne({ name: "User-PastDue" }).exec();
+      // if (!pastDueRole)
+      //   return res.status(400).json({ error: { message: "Role not found" } });
+      // user.role = pastDueRole._id;
+      // const b = await user.save().catch(() => null);
+      // if (b)
+      //   return res
+      //     .status(400)
+      //     .json({ error: { message: "Error updating the user role" } });
       break;
     case "customer.subscription.deleted":
+      console.log("---------------------SUBSCRIPTION DELETED----------------");
+
       if (event.request != null) {
         // handle a subscription cancelled by your request
         // from above.
@@ -105,6 +120,17 @@ export async function handleWebHook(
         // handle subscription cancelled automatically based
         // upon your subscription settings.
       }
+      const guestRole = await Role.findOne({ name: "Guest" }).exec();
+      if (!guestRole)
+        return res
+          .status(400)
+          .json({ error: { message: "Guest role not found" } });
+      user.role = guestRole._id;
+      const c = await user.save().catch(() => null);
+      if (c)
+        return res
+          .status(400)
+          .json({ error: { message: "Error updating the user role" } });
       break;
     default:
       // Unexpected event type

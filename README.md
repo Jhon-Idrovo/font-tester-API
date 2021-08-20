@@ -28,5 +28,4 @@ If an access or refresh token is stolen we can't verify that the user sending th
 
 TODO
 
-- Set error messages on auth responses. They should be ready for being displayed on the client directly.
-- create the getOrCreateCustomer method
+- handle 3DSecure payments with hosted links sent by email to the customer

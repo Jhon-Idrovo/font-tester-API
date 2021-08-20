@@ -47,6 +47,9 @@ export async function createElementsSubscription(
     // Note we're expanding the Subscription's
     // latest invoice and that invoice's payment_intent
     // so we can pass it to the front end to confirm the payment
+    // Do not save its id to the db since the payment could still fail
+    // We only do that on the webhook, when we're sure that the subscription
+    // was paid
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
       items: [
@@ -76,4 +79,36 @@ export async function createElementsSubscription(
     console.log("-------------------ERROR CREATING SUBSCRIPTION: ", error);
     return res.status(400).send({ error: { message: error.message } });
   }
+}
+/**
+ *Can be optimized since we retrieve the user
+ * @param req
+ * @param res
+ * @param next
+ * @returns
+ */
+export async function listSubscriptions(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  const user = await User.findById(userID).exec();
+  if (!user)
+    return res.status(400).json({ error: { message: "User not found" } });
+  const customer = getOrCreateCustomer(user);
+  const subscriptions = await stripe.subscriptions.list({
+    customer: (await customer).id,
+  });
+  return res.json({ ...subscriptions });
+}
+
+export async function cancelSubscription(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  //const { userID } = (req as RequestEnhanced).decodedToken;
+  const deleted = await stripe.subscriptions.del(req.body.subscriptionId);
+  return res.send();
 }
