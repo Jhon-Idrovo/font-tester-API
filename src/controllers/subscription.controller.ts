@@ -77,14 +77,12 @@ export async function createElementsSubscription(
     });
   } catch (error) {
     console.log("-------------------ERROR CREATING SUBSCRIPTION: ", error);
-    return res
-      .status(400)
-      .send({
-        error: {
-          message: "Error creating subscription, please try again.",
-          complete: error,
-        },
-      });
+    return res.status(400).send({
+      error: {
+        message: "Error creating subscription, please try again.",
+        complete: error,
+      },
+    });
   }
 }
 /**
@@ -127,4 +125,19 @@ export async function cancelSubscription(
     .del(req.body.subscriptionId)
     .catch((err) => null);
   return deleted ? res.send() : res.status(400).send();
+}
+export async function getPrices(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const prices = await stripe.prices.list();
+    return res.send({ prices });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(400)
+      .json({ error: { message: "Error retrieving prices" } });
+  }
 }
