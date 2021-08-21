@@ -141,3 +141,26 @@ export async function getPrices(
       .json({ error: { message: "Error retrieving prices" } });
   }
 }
+/**
+ * Given the new priceId and the subscriptionId in the body, update the subscription.
+ * @param req
+ * @param res
+ * @param next
+ * @returns Status code
+ */
+export async function updateSubscription(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { subscriptionId, priceId, itemId } = req.body;
+  try {
+    const updated = await stripe.subscriptions.update(subscriptionId, {
+      items: [{ id: itemId, price: priceId }],
+    });
+    res.send();
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ error: { message: "Unable to update" } });
+  }
+}
