@@ -10,6 +10,7 @@ import tokenRouter from "./token.routes";
 import userRouter from "./user.routes";
 import subscriptionRouter from "./subscription.routes";
 import webhookRouter from "./webhook.routes";
+import fontRouter from "./font.routes";
 import { basePath } from "../config/config";
 import passport from "passport";
 
@@ -31,6 +32,7 @@ app.use(`${basePath}/tokens`, tokenRouter);
 app.use(`${basePath}/users`, userRouter);
 app.use(`${basePath}/subscriptions`, subscriptionRouter);
 app.use(`${basePath}/webhook`, webhookRouter);
+app.use(`${basePath}/fonts`, fontRouter);
 
 //handle wrong paths
 app.use("*", (req: Request, res: Response) =>
