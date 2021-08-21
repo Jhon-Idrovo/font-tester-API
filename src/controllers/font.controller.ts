@@ -75,3 +75,21 @@ export async function getLikedFonts(
     });
   }
 }
+/**
+ * Deletes a match (group of fonts) from the Fonts_User_Liked collection
+ * @param req
+ * @param res
+ * @param next
+ * @returns
+ */
+export async function deleteLikedMatch(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { match_id } = req.params;
+  const deleted = await Fonts_User_Liked.findByIdAndDelete(match_id).exec();
+  return deleted
+    ? res.send()
+    : res.status(400).json({ error: { message: "Error deleting the match" } });
+}

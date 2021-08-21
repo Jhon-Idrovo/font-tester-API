@@ -5,5 +5,6 @@ const router = Router();
 
 router.use(verifyTokenMiddleware);
 router.post("/save", FontCtlr.saveLikedFonts);
-
+router.get("/liked", FontCtlr.getLikedFonts);
+router.delete("/delete_liked/:match_id", FontCtlr.deleteLikedMatch);
 export default router;
