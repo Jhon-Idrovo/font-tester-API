@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { IFont } from "../interfaces/fonts";
 import { RequestEnhanced } from "../interfaces/utils";
 import Font from "../models/Font";
-import Fonts_User from "../models/Fonts_User_Liked";
+import Fonts_User_Liked from "../models/Fonts_User_Liked";
 import User from "../models/User";
 import { findOrCreateFont } from "../utils/fonts";
 
@@ -37,7 +37,7 @@ export async function saveLikedFonts(
 
     // Attach the fonts and the user with the Font_User model
     const fonts_userPromises = fonts.map((matchingFonts) =>
-      Fonts_User.create({
+      Fonts_User_Liked.create({
         fonts_ids: matchingFonts.map((fontObj) => fontObj._id),
         user_id: userID,
       })
@@ -64,7 +64,7 @@ export async function getLikedFonts(
 ) {
   const { userID } = (req as RequestEnhanced).decodedToken;
   try {
-    const liked = await Fonts_User.find({ user_id: userID })
+    const liked = await Fonts_User_Liked.find({ user_id: userID })
       .populate("fonts_ids", "family category")
       .exec();
     res.json({ likedFonts: liked });
