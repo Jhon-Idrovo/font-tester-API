@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { IFont } from "../interfaces/fonts";
 import { RequestEnhanced } from "../interfaces/utils";
 import Font from "../models/Font";
-import Fonts_User from "../models/Fonts_User";
+import Fonts_User from "../models/Fonts_User_Liked";
 import User from "../models/User";
 import { findOrCreateFont } from "../utils/fonts";
 
@@ -20,9 +20,8 @@ export async function saveLikedFonts(
 ) {
   const { userID } = (req as RequestEnhanced).decodedToken;
   // Retrieve user
-  const user = await User.findById(userID);
-  if (!user)
-    return res.status(400).json({ error: { message: "User not found" } });
+  // Update: We do not need the user since we only need its id,
+  // which is in the token
   const { likedFonts }: { likedFonts: IFont[][] } = req.body;
   try {
     // Find or create all involucred fonts on one asynchronous step
@@ -49,5 +48,30 @@ export async function saveLikedFonts(
     console.log(error);
 
     return res.status(400).json({ error: { message: error.message } });
+  }
+}
+/**
+ * Using the userID from the token, retieve the Fonts_User_Liked
+ * @param req
+ * @param res
+ * @param next
+ * @returns
+ */
+export async function getLikedFonts(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  try {
+    const liked = await Fonts_User.find({ user_id: userID })
+      .populate("fonts_ids", "family category")
+      .exec();
+    res.json({ likedFonts: liked });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: { message: "Sorry we can't find the fonts. Try again." },
+    });
   }
 }
