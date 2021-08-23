@@ -3,6 +3,7 @@ import { IFont } from "../interfaces/fonts";
 import { RequestEnhanced } from "../interfaces/utils";
 import Font from "../models/Font";
 import Fonts_User_Liked from "../models/Fonts_User_Liked";
+import Font_User_Disliked from "../models/Font_User_Disliked";
 import User from "../models/User";
 import { findOrCreateFont } from "../utils/fonts";
 
@@ -92,4 +93,55 @@ export async function deleteLikedMatch(
   return deleted
     ? res.send()
     : res.status(400).json({ error: { message: "Error deleting the match" } });
+}
+export async function getDisliked(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  const dislikedFonts = await Font_User_Disliked.find({ user_id: userID })
+    .populate("font_id")
+    .exec();
+  res.json({ dislikedFonts });
+}
+export async function saveDisliked(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  const { family, category } = req.body.dislikedFont;
+  const font = await findOrCreateFont(family, category);
+  try {
+    // Search if it's already saved
+    const f = await Font_User_Disliked.findOne({
+      font_id: font._id,
+      user_id: userID,
+    }).exec();
+    if (f) return res.send();
+    const newDoc = await Font_User_Disliked.create({
+      font_id: font._id,
+      user_id: userID,
+    });
+    return res.send();
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(400)
+      .json({ error: { message: "Error saving to the database" } });
+  }
+}
+export async function deleteDisliked(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  const deleted = await Font_User_Disliked.findByIdAndDelete(
+    req.params.font_userId
+  );
+  return deleted
+    ? res.send()
+    : res.status(400).json({ error: { message: "Error deleting the record" } });
 }
