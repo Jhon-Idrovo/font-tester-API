@@ -5,7 +5,7 @@ export async function findOrCreateFont(
   family: IFont["family"],
   category: IFont["category"]
 ) {
-  let font = await Font.findOne({ family });
+  let font = await Font.findOne({ family }).exec();
   if (!font) font = await Font.create({ family, category });
   return font;
 }
