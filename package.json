@@ -25,6 +25,7 @@
     "passport-oauth": "^1.0.0",
     "passport-oauth2": "^1.6.0",
     "passport-twitter": "^1.0.4",
+    "morgan": "^1.10.0",
     "stripe": "^8.169.0"
   },
   "devDependencies": {
@@ -42,7 +43,6 @@
     "@types/passport-oauth2": "^1.4.11",
     "@types/passport-twitter": "^1.0.37",
     "jest": "^27.0.6",
-    "morgan": "^1.10.0",
     "nodemon": "^2.0.9",
     "ts-node": "^10.1.0",
     "tslint": "^6.1.3",
