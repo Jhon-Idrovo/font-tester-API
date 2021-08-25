@@ -11,7 +11,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "start": "node src/config/index.js",
+    "start": "node dist/src/config/index.js",
     "dev": "nodemon --trace-warnings --config nodemon.json src/config/index.ts"
   },
   "dependencies": {
