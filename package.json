@@ -5,10 +5,13 @@
   "repository": "https://github.com/Jhon-Idrovo/templates.git",
   "author": "Jhon Idrovo <jhonidrovo3@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": "14.17.4"
+  },
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node src/config/index.js",
     "dev": "nodemon --trace-warnings --config nodemon.json src/config/index.ts"
   },
   "dependencies": {
