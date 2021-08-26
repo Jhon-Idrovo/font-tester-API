@@ -14,5 +14,5 @@ export declare interface UserIfc {
 }
 
 export declare interface UserModel extends Model<UserIfc> {
-  encryptPassword(password: string): string;
+  encryptPassword(password: string): Promise<string>;
 }

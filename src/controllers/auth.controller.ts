@@ -237,6 +237,14 @@ export async function googleCallback(
 
   return res.send("success");
 }
+/**
+ * This is excuted before the passport strategy handler, which
+ * recieves the user data and fetches/creates the user. Then that user
+ * is passed to this function with the roles populated.
+ * @param req
+ * @param res
+ * @param next
+ */
 export async function handleGoogle(
   req: Request,
   res: Response,
@@ -249,7 +257,7 @@ export async function handleGoogle(
     { scope: ["profile", "email"], session: false },
     function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
       console.log(err, user, userInfo);
-      //role are populated
+      //roles are populated
       const role = user.role.name;
       const accesToken = generateAccessToken(
         user._id,
@@ -266,7 +274,7 @@ export async function handleGoogle(
       console.log("redirecting");
 
       return res.redirect(
-        `http://localhost:3000/redirect?at=${accesToken}&rt=${refreshToken}`
+        `http://localhost:3000/?at=${accesToken}&rt=${refreshToken}`
       );
     }
   )(req, res, next);

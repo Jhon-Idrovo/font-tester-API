@@ -14,15 +14,19 @@ export function verifyTokenMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const token = (req.headers.authorization as string).split(" ")[1];
-  const payload = token ? verifyToken(token as string) : false;
-  console.log(
-    "-----------------------TOKEN VERIFICATION----------------------- "
-  );
+  try {
+    const token = (req.headers.authorization as string).split(" ")[1];
+    const payload = token ? verifyToken(token as string) : false;
+    console.log(
+      "-----------------------TOKEN VERIFICATION----------------------- "
+    );
 
-  if (payload) {
-    (req as RequestEnhanced).decodedToken = payload;
-    return next();
+    if (payload) {
+      (req as RequestEnhanced).decodedToken = payload;
+      return next();
+    }
+    return res.status(401).json({ error: { message: "Authorization failed" } });
+  } catch (error) {
+    return res.status(401).json({ error: { message: "Authorization failed" } });
   }
-  return res.status(401).json({ error: { message: "Authorization failed" } });
 }

@@ -6,6 +6,7 @@ import User from "../models/User";
 import { basePath } from "./config";
 import mongoose from "mongoose";
 import Role from "../models/Role";
+import { getOrCreateUser } from "../utils/users";
 
 export const googleRedirectUrl = `${basePath}/auth/google`;
 passport.use(
@@ -22,32 +23,22 @@ passport.use(
       cb: Function
     ) {
       console.log("user info: ", userInfo);
-      const role = await Role.findOne({ name: "User" });
       const { id, displayName, email, picture } = userInfo;
-      //we cannot user the id for generating an ObjectId because
+      //we cannot use the id for generating an ObjectId because
       //ObjectId(id) it generates a new one each time.
-      //both fields are unique
-      const user = await User.findOne({ email, username: displayName })
-        .populate("roles", "name")
-        .exec();
-      //user already exists
-      if (user) {
-        console.log("user found", user);
-
-        return cb(null, user);
-      }
-      //create new user
+      //email is unique
       try {
-        const newUser = await User.create({
-          username: displayName,
-          password: "empty",
-          authMethod: "google",
+        const user = await getOrCreateUser(
           email,
-          roles: role?._id,
-        });
+          displayName,
+          "google",
+          "empty",
+          id
+        );
+
         //populate to avoid refetching on the next function
-        newUser.populate("roles", "name");
-        return cb(null, newUser);
+        user.populate("roles", "name");
+        return cb(null, user);
       } catch (error) {
         console.log(error);
 
@@ -73,7 +64,8 @@ passport.use(
       cb: Function
     ) {
       console.log("user info: ", userInfo);
-      const role = await Role.findOne({ name: "User" });
+      // get the user
+      //const user = getOrCreateUser()
     }
   )
 );
