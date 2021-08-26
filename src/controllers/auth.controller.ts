@@ -285,13 +285,34 @@ export async function handleFacebook(
   res: Response,
   next: NextFunction
 ) {
-  passport.authenticate(
-    "facebook",
-    { session: false },
-    function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
-      console.log("on handleFacebook:", userInfo, user);
-    }
-  )(req, res, next);
+  console.log("handleFacebook REQUEST:------------------", req);
+
+  // passport.authenticate(
+  //   "facebook",
+  //   { session: false },
+  //   function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
+  //     console.log("on handleFacebook:", userInfo, user);
+  //     //roles are populated
+  //     const role = user.role.name;
+  //     const accesToken = generateAccessToken(
+  //       user._id,
+  //       role,
+  //       user.email,
+  //       user.username
+  //     );
+  //     const refreshToken = generateRefreshToken(
+  //       user._id,
+  //       role,
+  //       user.email,
+  //       user.username
+  //     );
+  //     console.log("redirecting");
+
+  //     return res.redirect(
+  //       `http://localhost:3000/?at=${accesToken}&rt=${refreshToken}`
+  //     );
+  //   }
+  // )(req, res, next);
 }
 export async function handleTwitter(
   req: Request,

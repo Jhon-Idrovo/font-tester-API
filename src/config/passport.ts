@@ -47,7 +47,7 @@ passport.use(
     }
   )
 );
-export const facebookCbURL = `${basePath}/auth/facebook`;
+export const facebookCbURL = `${basePath}/auth/facebook/callback`;
 passport.use(
   new FacebookStrategy(
     {
