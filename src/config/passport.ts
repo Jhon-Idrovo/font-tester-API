@@ -63,7 +63,7 @@ passport.use(
       userInfo,
       cb: Function
     ) {
-      console.log("user info: ", userInfo);
+      console.log("on passport strategy, user info: ", userInfo);
       // get the user
       //const user = getOrCreateUser()
       const { displayName, id, emails } = userInfo;

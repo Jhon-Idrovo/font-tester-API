@@ -289,7 +289,7 @@ export async function handleFacebook(
     "facebook",
     { session: false },
     function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
-      console.log(userInfo, user);
+      console.log("on handleFacebook:", userInfo, user);
     }
   )(req, res, next);
 }
