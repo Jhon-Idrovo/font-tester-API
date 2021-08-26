@@ -288,7 +288,9 @@ export async function handleFacebook(
   passport.authenticate(
     "facebook",
     { session: false },
-    function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {}
+    function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
+      console.log(userInfo, user);
+    }
   )(req, res, next);
 }
 export async function handleTwitter(

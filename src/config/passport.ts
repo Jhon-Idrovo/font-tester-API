@@ -66,6 +66,19 @@ passport.use(
       console.log("user info: ", userInfo);
       // get the user
       //const user = getOrCreateUser()
+      const { displayName, id, emails } = userInfo;
+      if (!emails)
+        return cb(
+          new Error("User doesn't have an email associated with its account")
+        );
+      const user = await getOrCreateUser(
+        emails[0].value,
+        displayName,
+        "facebook",
+        "facebook",
+        id
+      );
+      return cb(null, user);
     }
   )
 );
@@ -78,8 +91,21 @@ passport.use(
       consumerSecret: process.env.TWITTER_API_SECRET as string,
       callbackURL: twitterCbURL,
     },
-    function (token, tokenSecret, profile, cb) {
+    async function (token, tokenSecret, profile, cb) {
       console.log(profile);
+      const { displayName, emails, id } = profile;
+      if (!emails)
+        return cb(
+          new Error("User doesn't have an email associated with its account")
+        );
+      const user = await getOrCreateUser(
+        emails[0].value,
+        displayName,
+        "twitter",
+        "twitter",
+        id
+      );
+      return cb(null, user);
     }
   )
 );
