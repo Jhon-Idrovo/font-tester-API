@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 import Role from "../models/Role";
 import { getOrCreateUser } from "../utils/users";
 
-export const googleRedirectUrl = `${basePath}/auth/google`;
+export const googleRedirectUrl = `https://font-tester-api.herokuapp.com/api/v3/auth/google`;
 passport.use(
   new GoogleStrategy(
     {
@@ -47,7 +47,7 @@ passport.use(
     }
   )
 );
-export const facebookCbURL = `https://font-tester-api.herokuapp.com${basePath}/auth/facebook/callback`;
+export const facebookCbURL = `https://font-tester-api.herokuapp.com/api/v3/auth/facebook/callback`;
 passport.use(
   new FacebookStrategy(
     {
@@ -83,7 +83,7 @@ passport.use(
   )
 );
 
-export const twitterCbURL = `https://font-tester-api.herokuapp.com${basePath}auth/twitter/callback`;
+export const twitterCbURL = `https://font-tester-api.herokuapp.com/api/v3/auth/twitter/callback`;
 passport.use(
   new TwitterStrategy(
     {
