@@ -14,6 +14,7 @@ import {
 import passport from "passport";
 import { UserIfc } from "../interfaces/users";
 import { Document } from "mongoose";
+import { clientDomainPath } from "../config/config";
 
 /**
  * Verifies username and password against the database. If good, returns an object
@@ -337,10 +338,10 @@ export async function handleTwitter(
   if (role === "Guest") {
     //redirect to complete signup
     return res.redirect(
-      `http://localhost:3000/signup?at=${accesToken}&rt=${refreshToken}`
+      `${clientDomainPath}/signup?at=${accesToken}&rt=${refreshToken}`
     );
   }
   return res.redirect(
-    `http://localhost:3000/?at=${accesToken}&rt=${refreshToken}`
+    `${clientDomainPath}/?at=${accesToken}&rt=${refreshToken}`
   );
 }

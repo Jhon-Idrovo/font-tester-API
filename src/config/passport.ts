@@ -83,7 +83,7 @@ passport.use(
   )
 );
 
-export const twitterCbURL = `https://font-tester-api.herokuapp.com/api/v3/auth/twitter/callback`;
+export const twitterCbURL = `${basePath}auth/twitter/callback`;
 passport.use(
   new TwitterStrategy(
     {
