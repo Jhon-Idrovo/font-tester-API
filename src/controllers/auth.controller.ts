@@ -285,15 +285,32 @@ export async function handleFacebook(
   res: Response,
   next: NextFunction
 ) {
-  console.log("handleFacebook REQUEST:------------------", req);
-
-  // passport.authenticate(
-  //   "facebook",
-  //   { session: false },
-  //   function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
-  //     console.log("on handleFacebook:", userInfo, user);
-
-  // )(req, res, next);
+  console.log("handleFacebook REQUEST:------------------");
+  const user = req.user as UserIfc & Document<any, any, UserIfc>;
+  //roles are populated
+  const role = user.role.name;
+  const accesToken = generateAccessToken(
+    user._id,
+    role,
+    user.email,
+    user.username
+  );
+  const refreshToken = generateRefreshToken(
+    user._id,
+    role,
+    user.email,
+    user.username
+  );
+  console.log("redirecting");
+  if (role === "Guest") {
+    //redirect to complete signup
+    return res.redirect(
+      `http://localhost:3000/signup?at=${accesToken}&rt=${refreshToken}`
+    );
+  }
+  return res.redirect(
+    `http://localhost:3000/?at=${accesToken}&rt=${refreshToken}`
+  );
 }
 export async function handleTwitter(
   req: Request,
