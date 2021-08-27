@@ -47,7 +47,7 @@ passport.use(
     }
   )
 );
-export const facebookCbURL = `${basePath}/auth/facebook/callback`;
+export const facebookCbURL = `https://font-tester-api.herokuapp.com${basePath}/auth/facebook/callback`;
 passport.use(
   new FacebookStrategy(
     {
@@ -83,7 +83,7 @@ passport.use(
   )
 );
 
-export const twitterCbURL = `${basePath}auth/twitter/callback`;
+export const twitterCbURL = `https://font-tester-api.herokuapp.com${basePath}auth/twitter/callback`;
 passport.use(
   new TwitterStrategy(
     {

@@ -223,22 +223,6 @@ export async function createAdminHandler(
 }
 
 /**
- * Returns a succesful response to the client upon which it would
- * redirect to the home page. Now the access and refresh token are included
- * @param req
- * @param res
- * @param next
- */
-export async function googleCallback(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  console.log("on callback 2", req);
-
-  return res.send("success");
-}
-/**
  * This is excuted before the passport strategy handler, which
  * recieves the user data and fetches/creates the user. Then that user
  * is passed to this function with the roles populated.
@@ -274,8 +258,14 @@ export async function handleGoogle(
       );
       console.log("redirecting");
 
+      if (role === "Guest") {
+        //redirect to complete signup
+        return res.redirect(
+          `${clientDomainPath}/signup?at=${accesToken}&rt=${refreshToken}`
+        );
+      }
       return res.redirect(
-        `http://localhost:3000/?at=${accesToken}&rt=${refreshToken}`
+        `${clientDomainPath}/?at=${accesToken}&rt=${refreshToken}`
       );
     }
   )(req, res, next);
@@ -306,11 +296,11 @@ export async function handleFacebook(
   if (role === "Guest") {
     //redirect to complete signup
     return res.redirect(
-      `http://localhost:3000/signup?at=${accesToken}&rt=${refreshToken}`
+      `${clientDomainPath}/signup?at=${accesToken}&rt=${refreshToken}`
     );
   }
   return res.redirect(
-    `http://localhost:3000/?at=${accesToken}&rt=${refreshToken}`
+    `${clientDomainPath}/?at=${accesToken}&rt=${refreshToken}`
   );
 }
 export async function handleTwitter(
