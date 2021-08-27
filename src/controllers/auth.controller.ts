@@ -324,7 +324,7 @@ export async function handleTwitter(
     user.email,
     user.username
   );
-  console.log("redirecting");
+  console.log("redirecting", clientDomainPath);
   if (role === "Guest") {
     //redirect to complete signup
     return res.redirect(

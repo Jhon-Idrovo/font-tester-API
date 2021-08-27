@@ -5,5 +5,5 @@ const version = 3;
 export const basePath = `/api/v${version}`;
 export const clientDomainPath =
   process.env.NODE_ENV === "production"
-    ? "https://font-tester-api.herokuapp.com"
+    ? "https://font-tester-inky.vercel.app"
     : "http://localhost:8000";
