@@ -4,6 +4,7 @@
 import express, { Response, Request, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
+import session from "express-session";
 
 import authRouter from "./auth.routes";
 import tokenRouter from "./token.routes";
@@ -25,8 +26,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 app.use(cors());
 app.use(morgan("dev"));
+//sessions
+app.use(
+  session({ secret: "la-vaca-lola", resave: false, saveUninitialized: false })
+);
 //initialize passport
 app.use(passport.initialize());
+app.use(passport.session());
 app.use(`${basePath}/auth`, authRouter);
 app.use(`${basePath}/tokens`, tokenRouter);
 app.use(`${basePath}/users`, userRouter);

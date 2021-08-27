@@ -21,5 +21,10 @@ router.get(
   AuthCtlr.handleFacebook
 );
 //sign in with twitter
-router.get("/twitter", AuthCtlr.handleTwitter);
+router.get("/twitter", passport.authenticate("twitter", { session: false }));
+router.get(
+  "/twitter/callback",
+  passport.authenticate("twitter", { session: false }),
+  AuthCtlr.handleTwitter
+);
 export default router;

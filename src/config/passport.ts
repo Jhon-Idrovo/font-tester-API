@@ -83,20 +83,22 @@ passport.use(
   )
 );
 
-export const twitterCbURL = `${basePath}/auth/twitter`;
+export const twitterCbURL = `${basePath}/auth/twitter/callback`;
 passport.use(
   new TwitterStrategy(
     {
       consumerKey: process.env.TWITTER_API_KEY as string,
       consumerSecret: process.env.TWITTER_API_SECRET as string,
       callbackURL: twitterCbURL,
+      includeEmail: true,
     },
     async function (token, tokenSecret, profile, cb) {
       console.log("on passport. Profile:", profile);
       const { displayName, emails, id } = profile;
       if (!emails)
         return cb(
-          new Error("User doesn't have an email associated with its account")
+          new Error("User doesn't have an email associated with its account"),
+          null
         );
       const user = await getOrCreateUser(
         emails[0].value,
@@ -105,6 +107,8 @@ passport.use(
         "twitter",
         id
       );
+      //populate user
+      await user.populate("role").execPopulate();
       return cb(null, user);
     }
   )

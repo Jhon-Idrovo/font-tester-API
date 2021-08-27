@@ -292,26 +292,7 @@ export async function handleFacebook(
   //   { session: false },
   //   function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
   //     console.log("on handleFacebook:", userInfo, user);
-  //     //roles are populated
-  //     const role = user.role.name;
-  //     const accesToken = generateAccessToken(
-  //       user._id,
-  //       role,
-  //       user.email,
-  //       user.username
-  //     );
-  //     const refreshToken = generateRefreshToken(
-  //       user._id,
-  //       role,
-  //       user.email,
-  //       user.username
-  //     );
-  //     console.log("redirecting");
 
-  //     return res.redirect(
-  //       `http://localhost:3000/?at=${accesToken}&rt=${refreshToken}`
-  //     );
-  //   }
   // )(req, res, next);
 }
 export async function handleTwitter(
@@ -319,11 +300,30 @@ export async function handleTwitter(
   res: Response,
   next: NextFunction
 ) {
-  passport.authenticate(
-    "twitter",
-    { session: false },
-    function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
-      console.log("handleTwitter", user, userInfo);
-    }
-  )(req, res, next);
+  console.log("handleTwitter", req.user);
+  const user = req.user as UserIfc & Document<any, any, UserIfc>;
+  //roles are populated
+  const role = user.role.name;
+  const accesToken = generateAccessToken(
+    user._id,
+    role,
+    user.email,
+    user.username
+  );
+  const refreshToken = generateRefreshToken(
+    user._id,
+    role,
+    user.email,
+    user.username
+  );
+  console.log("redirecting");
+  if (role === "Guest") {
+    //redirect to complete signup
+    return res.redirect(
+      `http://localhost:3000/signup?at=${accesToken}&rt=${refreshToken}`
+    );
+  }
+  return res.redirect(
+    `http://localhost:3000/?at=${accesToken}&rt=${refreshToken}`
+  );
 }
