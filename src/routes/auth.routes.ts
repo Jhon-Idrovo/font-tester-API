@@ -17,7 +17,7 @@ router.get("/google", AuthCtlr.handleGoogle);
 router.get("/facebook", passport.authenticate("facebook"));
 router.get(
   "/facebook/callback",
-  passport.authenticate("facebook", { session: false }),
+  passport.authenticate("facebook", { session: false, scope: "email" }),
   AuthCtlr.handleFacebook
 );
 //sign in with twitter

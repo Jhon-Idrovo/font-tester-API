@@ -322,6 +322,8 @@ export async function handleTwitter(
   passport.authenticate(
     "twitter",
     { session: false },
-    function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {}
+    function (err, user: UserIfc & Document<any, any, UserIfc>, userInfo) {
+      console.log("handleTwitter", user, userInfo);
+    }
   )(req, res, next);
 }

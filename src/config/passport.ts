@@ -92,7 +92,7 @@ passport.use(
       callbackURL: twitterCbURL,
     },
     async function (token, tokenSecret, profile, cb) {
-      console.log(profile);
+      console.log("on passport. Profile:", profile);
       const { displayName, emails, id } = profile;
       if (!emails)
         return cb(
