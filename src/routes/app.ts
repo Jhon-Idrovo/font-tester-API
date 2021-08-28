@@ -12,6 +12,7 @@ import userRouter from "./user.routes";
 import subscriptionRouter from "./subscription.routes";
 import webhookRouter from "./webhook.routes";
 import fontRouter from "./font.routes";
+import paypalRouter from "./paypal.routes";
 import { basePath } from "../config/config";
 import passport from "passport";
 
@@ -39,6 +40,7 @@ app.use(`${basePath}/users`, userRouter);
 app.use(`${basePath}/subscriptions`, subscriptionRouter);
 app.use(`${basePath}/webhook`, webhookRouter);
 app.use(`${basePath}/fonts`, fontRouter);
+app.use(`${basePath}/paypal`, paypalRouter);
 
 //handle wrong paths
 app.use("*", (req: Request, res: Response) =>
