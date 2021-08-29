@@ -1,6 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import Stripe from "stripe";
-import { stripe } from "../config/stripe";
+import { IWebhookBody } from "../interfaces/webhook_events";
 import Role from "../models/Role";
 import User from "../models/User";
 /**
@@ -22,9 +21,38 @@ export async function handleWebHook(
   console.log(
     "---------------------------HANDLING WEBHOOK--------------------------------"
   );
-  console.log(req);
-
-  //PAYMENT.SALE.COMPLETED= A payment is made on the subscription
+  console.log(req.body);
+  const { id, event_type, resource } = req.body as IWebhookBody;
+  const userId = resource.subscriber.payer_id;
+  const user = await User.findById(userId).exec();
+  if (!user)
+    return res.status(400).json({ error: { message: "User not found" } });
+  switch (event_type) {
+    //PAYMENT.SALE.COMPLETED= A payment is made on the subscription
+    case "PAYMENT.SALE.COMPLETED":
+    case "BILLING.SUBSCRIPTION.ACTIVATED":
+      const role = await Role.findOne({ name: "User" });
+      if (!role)
+        return res
+          .status(400)
+          .json({ error: { message: 'Role "User" not found' } });
+      user.role = role._id;
+      await user.save();
+      break;
+    case "BILLING.SUBSCRIPTION.CANCELLED":
+    case "BILLING.SUBSCRIPTION.SUSPENDED":
+    case "PAYMENT.SALE.REVERSED":
+      const guestRole = await Role.findOne({ name: "Guest" });
+      if (!guestRole)
+        return res
+          .status(400)
+          .json({ error: { message: 'Role "User" not found' } });
+      user.role = guestRole._id;
+      await user.save();
+      break;
+    default:
+      break;
+  }
   //PAYMENT.SALE.REVERSED = The payment was reversed
 
   res.sendStatus(200);
