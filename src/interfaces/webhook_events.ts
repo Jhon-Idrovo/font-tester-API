@@ -4,7 +4,8 @@ export declare type EventType =
   | "PAYMENT.SALE.REVERSED"
   | "BILLING.SUBSCRIPTION.SUSPENDED"
   | "BILLING.SUBSCRIPTION.CANCELLED"
-  | "BILLING.SUBSCRIPTION.UPDATED";
+  | "BILLING.SUBSCRIPTION.UPDATED"
+  | "PAYMENT.SALE.REFUNDED";
 export declare interface IWebhookBody {
   id: string;
   create_time: "2018-19-12T22:20:32.000Z";

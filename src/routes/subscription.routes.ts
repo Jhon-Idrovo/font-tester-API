@@ -6,6 +6,7 @@ router.get("/plans", SubscriptionCtlr.listPlans);
 router.use(verifyTokenMiddleware);
 router.get("/", SubscriptionCtlr.listSubscriptions);
 router.post("/create/:planId", SubscriptionCtlr.createSubscription);
+router.post("/activate/:subscriptionId", SubscriptionCtlr.activateSubscription);
 router.post("/cancel", SubscriptionCtlr.cancelSubscription);
 router.post("/update", SubscriptionCtlr.updateSubscription);
 export default router;

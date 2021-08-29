@@ -53,7 +53,6 @@ export async function handleWebHook(
     default:
       break;
   }
-  //PAYMENT.SALE.REVERSED = The payment was reversed
 
   res.sendStatus(200);
 }
