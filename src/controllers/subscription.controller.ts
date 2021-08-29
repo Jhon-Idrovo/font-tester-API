@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { stripe } from "../config/stripe";
 import { RequestEnhanced } from "../interfaces/utils";
 import User from "../models/User";
-import Stripe from "stripe";
 import { getOrCreateCustomer } from "../utils/stripe";
+import axiosPayPal from "../config/axiosPayPal";
 
 /**
  * At this point the user is authenticated and it's information is
@@ -16,7 +16,7 @@ import { getOrCreateCustomer } from "../utils/stripe";
  * @param next
  * @returns
  */
-export async function createElementsSubscription(
+export async function createSubscription(
   req: Request,
   res: Response,
   next: NextFunction
@@ -25,64 +25,19 @@ export async function createElementsSubscription(
     "-----------------------CREATING SUBSCRIPTION--------------------------"
   );
 
-  const { priceId, paymentMethod } = req.body;
   const { userID } = (req as RequestEnhanced).decodedToken;
-  //we can only call this route if the user is logged in
-  const user = await User.findById(userID).exec();
-
-  if (!user)
-    return res.status(400).json({ error: { message: "User not found" } });
+  const planId = req.params.planId;
   try {
-    const customer = await getOrCreateCustomer(user);
-    //attach the payment method to the customer
-    await stripe.paymentMethods.attach(paymentMethod, {
-      customer: customer.id,
+    const r = await axiosPayPal.post("/v1/billing/subscriptions", {
+      plan_id: planId,
+      subscriber: { payer_id: userID },
     });
-    //set the default payment method
-    await stripe.customers.update(customer.id, {
-      invoice_settings: { default_payment_method: paymentMethod },
-    });
-
-    //create subscription
-    // Note we're expanding the Subscription's
-    // latest invoice and that invoice's payment_intent
-    // so we can pass it to the front end to confirm the payment
-    // Do not save its id to the db since the payment could still fail
-    // We only do that on the webhook, when we're sure that the subscription
-    // was paid
-    const subscription = await stripe.subscriptions.create({
-      customer: customer.id,
-      items: [
-        {
-          price: priceId,
-        },
-      ],
-      payment_behavior: "default_incomplete",
-      expand: ["latest_invoice.payment_intent"],
-    });
-    //stripe will try to make the transaction with the payment method provided previously
-    const invoice = subscription.latest_invoice as Stripe.Invoice;
-    const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
-    console.log(
-      "-----------Subscription:",
-      subscription,
-      "----------Customer:",
-      customer,
-      "--------USER:",
-      user
-    );
-
-    res.send({
-      payment_intent: paymentIntent,
-    });
+    res.status(201).json({ subscriptionId: r.data.id });
   } catch (error) {
-    console.log("-------------------ERROR CREATING SUBSCRIPTION: ", error);
-    return res.status(400).send({
-      error: {
-        message: "Error creating subscription, please try again.",
-        complete: error,
-      },
-    });
+    console.log(error);
+    return res
+      .status(400)
+      .json({ error: { message: "Error creating subscription" } });
   }
 }
 /**
@@ -126,14 +81,28 @@ export async function cancelSubscription(
     .catch((err) => null);
   return deleted ? res.send() : res.status(400).send();
 }
-export async function getPrices(
+export async function listPlans(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const prices = await stripe.prices.list();
-    return res.send({ prices });
+    const r = await axiosPayPal.get(
+      "/v1/billing/plans?product_id=PROD-6H551225VH0756808",
+      { headers: { Prefer: "return=representation" } }
+    );
+
+    const plans = r.data.plans.filter((plan) => plan.status === "ACTIVE");
+
+    return res.send({
+      plans: plans.map((plan) => ({
+        id: plan.id,
+        displayName: plan.name,
+        price: parseFloat(
+          plan.billing_cycles[1].pricing_scheme.fixed_price.value
+        ),
+      })),
+    });
   } catch (error) {
     console.log(error);
     return res
@@ -153,11 +122,7 @@ export async function updateSubscription(
   res: Response,
   next: NextFunction
 ) {
-  const { subscriptionId, priceId, itemId } = req.body;
   try {
-    const updated = await stripe.subscriptions.update(subscriptionId, {
-      items: [{ id: itemId, price: priceId }],
-    });
     res.send();
   } catch (error) {
     console.log(error);

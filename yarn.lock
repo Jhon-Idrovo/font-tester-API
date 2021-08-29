@@ -769,6 +769,13 @@
   dependencies:
     "@types/express" "*"
 
+"@types/paypal-rest-sdk@^1.7.6":
+  version "1.7.6"
+  resolved "https://registry.yarnpkg.com/@types/paypal-rest-sdk/-/paypal-rest-sdk-1.7.6.tgz#23b20b2fe6a3352dc4c6b06e5820dd3af268afef"
+  integrity sha512-YUzJd4xEdSBFmsdfNuQBIGHbskgkf61w9TBcnieCDGTwRXLqsUgEHcB78sMv4hfB4a6S3kos8nUuWRpICohsYA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/prettier@^2.1.5":
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.3.2.tgz#fc8c2825e4ed2142473b4a81064e6e081463d1b3"
