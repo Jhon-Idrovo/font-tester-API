@@ -93,7 +93,6 @@ export async function listSubscriptions(
     const r = await axiosPayPal.get(
       `/v1/billing/subscriptions/${user.subscriptionId}`
     );
-    console.log(r);
     const { id, plan_id, status, billing_info } = r.data as ISubscription;
     const r2 = await axiosPayPal.get(`/v1/billing/plans/${plan_id}`);
     const { billing_cycles, id: planId } = r2.data as IPlan;
@@ -126,11 +125,19 @@ export async function cancelSubscription(
   res: Response,
   next: NextFunction
 ) {
-  //const { userID } = (req as RequestEnhanced).decodedToken;
-  const deleted = await stripe.subscriptions
-    .del(req.body.subscriptionId)
-    .catch((err) => null);
-  return deleted ? res.send() : res.status(400).send();
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  const { subscriptionId } = req.body;
+
+  try {
+    await axiosPayPal.post(
+      `/v1/billing/subscriptions/${subscriptionId}/cancel`
+    );
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: { message: "Error cancelling the subscription", error },
+    });
+  }
 }
 /**
  * Given the new priceId and the subscriptionId in the body, update the subscription.
