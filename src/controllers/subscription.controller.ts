@@ -4,6 +4,7 @@ import { RequestEnhanced } from "../interfaces/utils";
 import User from "../models/User";
 import { getOrCreateCustomer } from "../utils/stripe";
 import axiosPayPal from "../config/axiosPayPal";
+import { use } from "passport";
 
 /**
  * At this point the user is authenticated and it's information is
@@ -39,7 +40,7 @@ export async function listPlans(
   }
 }
 /**
- *
+ * DEPRECATED
  * @param req
  * @param res
  * @param next
@@ -56,21 +57,9 @@ export async function createSubscription(
 
   const { userID } = (req as RequestEnhanced).decodedToken;
   const planId = req.params.planId;
-  try {
-    const r = await axiosPayPal.post("/v1/billing/subscriptions", {
-      plan_id: planId,
-      subscriber: { payer_id: userID },
-    });
-    res.status(201).json({ subscriptionId: r.data.id });
-  } catch (error) {
-    console.log(error);
-    return res
-      .status(400)
-      .json({ error: { message: "Error creating subscription" } });
-  }
 }
 /**
- *
+ * DEPRECATED
  * @param req
  * @param res
  * @param next
@@ -83,19 +72,33 @@ export async function activateSubscription(
 ) {
   const { userID } = (req as RequestEnhanced).decodedToken;
   const subscriptionId = req.params.subscriptionId;
+}
+/**
+ * Attach the subscriptionId to the user. Each subscription is unique on the db.
+ * This ensures no subscription sharing.
+ * @param req
+ * @param res
+ * @param next
+ * @returns
+ */
+export async function attachSubscription(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  const { subscriptionId } = req.body;
+  const user = await User.findById(userID).exec();
+  if (!user)
+    return res.status(400).json({ error: { message: "User not found" } });
+  user.subscriptionId = subscriptionId;
   try {
-    const r = await axiosPayPal.post(
-      `/v1/billing/subscriptions/${subscriptionId}/activate`
-    );
-    console.log(r);
-
-    return res.send(r.data);
+    await user.save();
   } catch (error) {
     console.log(error);
-
-    return res
-      .status(400)
-      .json({ error: { message: "Error activating subscription" } });
+    return res.status(400).json({
+      error: { message: "Error attaching the subscription id", error },
+    });
   }
 }
 /**

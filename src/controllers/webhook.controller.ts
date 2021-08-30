@@ -23,10 +23,16 @@ export async function handleWebHook(
   );
   console.log(req.body);
   const { id, event_type, resource } = req.body as IWebhookBody;
-  const userId = resource.subscriber.payer_id;
-  const user = await User.findById(userId).exec();
-  if (!user)
+
+  const users = await User.find({ subscriptionId: id }).exec();
+  // handle this security breach.
+  if (users.length > 1) return res.send();
+  // this doesn't needs to be inside of each case since not all events come here,
+  // only the events we handle.
+  if (users.length < 1)
     return res.status(400).json({ error: { message: "User not found" } });
+
+  const user = users[0];
   switch (event_type) {
     //PAYMENT.SALE.COMPLETED= A payment is made on the subscription
     case "PAYMENT.SALE.COMPLETED":

@@ -10,7 +10,7 @@ const userSchema = new Schema<UserIfc, UserModel>({
   role: { ref: "Role", type: Schema.Types.ObjectId, require: true },
   likedFonts: { ref: "Font", type: Schema.Types.ObjectId },
   unlikedFonts: { ref: "Font", type: Schema.Types.ObjectId },
-  stripeID: { type: String, require: false, unique: true },
+  subscriptionId: { type: String, require: false, unique: true },
 });
 
 /**

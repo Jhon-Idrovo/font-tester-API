@@ -10,8 +10,8 @@ import { UserIfc } from "../interfaces/users";
 export async function getOrCreateCustomer(
   user: UserIfc & Document<any, any, UserIfc>
 ) {
-  if (user.stripeID) {
-    return await stripe.customers.retrieve(user.stripeID);
+  if (user.subscriptionId) {
+    return await stripe.customers.retrieve(user.subscriptionId);
   }
   //create customer. We need to save it's id to the database
   //attach the user's _id to the stripe customer. This help us later for retrieving
@@ -21,7 +21,7 @@ export async function getOrCreateCustomer(
     metadata: { _id: user._id.toString() },
   });
   //save the customer id to the database
-  user.stripeID = customer.id;
+  user.subscriptionId = customer.id;
   await user.save();
   return customer;
 }
