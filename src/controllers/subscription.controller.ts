@@ -5,6 +5,11 @@ import User from "../models/User";
 import { getOrCreateCustomer } from "../utils/stripe";
 import axiosPayPal from "../config/axiosPayPal";
 import { use } from "passport";
+import {
+  IPlan,
+  IResponseSubscription,
+  ISubscription,
+} from "../interfaces/webhook_events";
 
 /**
  * At this point the user is authenticated and it's information is
@@ -83,6 +88,31 @@ export async function listSubscriptions(
   const user = await User.findById(userID).exec();
   if (!user)
     return res.status(400).json({ error: { message: "User not found" } });
+
+  try {
+    const r = await axiosPayPal.get(
+      `/v1/billing/subscriptions/${user.subscriptionId}`
+    );
+    console.log(r);
+    const { id, plan_id, status, billing_info } = r.data as ISubscription;
+    const r2 = await axiosPayPal.get(`/v1/billing/plans/${plan_id}`);
+    const { billing_cycles, id: planId } = r2.data as IPlan;
+    return res.json({
+      subscription: {
+        billingCycle: billing_cycles[1].frequency.interval_unit,
+        status,
+        id,
+        nextBillingDate: billing_info.next_billing_time,
+        planId,
+        price: billing_cycles[1].pricing_scheme.fixed_price.value,
+      } as IResponseSubscription,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: { message: "Error retrieving the subscription", error },
+    });
+  }
 }
 /**
  * Given the subscriptionId in the body, cancel the subscription
@@ -114,8 +144,17 @@ export async function updateSubscription(
   res: Response,
   next: NextFunction
 ) {
+  const { subscriptionId, newPlanId } = req.body;
   try {
-    res.send();
+    const r = await axiosPayPal.post(
+      `/v1/billing/subscriptions/${subscriptionId}/revise`,
+      {
+        plan_id: newPlanId,
+      }
+    );
+    console.log(r.data.links);
+
+    res.send({ activationLink: r.data.links[0].href });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ error: { message: "Unable to update" } });
