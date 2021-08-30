@@ -22,7 +22,7 @@ export async function listPlans(
 ) {
   try {
     const r = await axiosPayPal.get(
-      "/v1/billing/plans?product_id=PROD-6H551225VH0756808",
+      "/v1/billing/plans?product_id=PROD-2UV37604AU5086019",
       { headers: { Prefer: "return=representation" } }
     );
 
