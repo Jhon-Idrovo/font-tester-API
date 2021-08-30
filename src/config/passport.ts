@@ -63,18 +63,23 @@ passport.use(
       // get the user
       //const user = getOrCreateUser()
       const { displayName, id, emails } = userInfo;
-      if (!emails)
-        return cb(
-          new Error("User doesn't have an email associated with its account")
+      try {
+        if (!emails)
+          return cb(
+            new Error("User doesn't have an email associated with its account")
+          );
+        const user = await getOrCreateUser(
+          emails[0].value,
+          displayName,
+          "facebook",
+          "facebook",
+          id
         );
-      const user = await getOrCreateUser(
-        emails[0].value,
-        displayName,
-        "facebook",
-        "facebook",
-        id
-      );
-      return cb(null, user);
+        return cb(null, user);
+      } catch (error) {
+        console.log(error);
+        return cb(error, null);
+      }
     }
   )
 );
@@ -91,21 +96,26 @@ passport.use(
     async function (token, tokenSecret, profile, cb) {
       console.log("on passport. Profile:", profile);
       const { displayName, emails, id } = profile;
-      if (!emails)
-        return cb(
-          new Error("User doesn't have an email associated with its account"),
-          null
+      try {
+        if (!emails)
+          return cb(
+            new Error("User doesn't have an email associated with its account"),
+            null
+          );
+        const user = await getOrCreateUser(
+          emails[0].value,
+          displayName,
+          "twitter",
+          "twitter",
+          id
         );
-      const user = await getOrCreateUser(
-        emails[0].value,
-        displayName,
-        "twitter",
-        "twitter",
-        id
-      );
-      //populate user
-      await user.populate("role").execPopulate();
-      return cb(null, user);
+        //populate user
+        await user.populate("role").execPopulate();
+        return cb(null, user);
+      } catch (error) {
+        console.log(error);
+        return cb(error, null);
+      }
     }
   )
 );
