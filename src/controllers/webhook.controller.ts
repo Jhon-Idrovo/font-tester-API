@@ -45,6 +45,7 @@ export async function handleWebHook(
       await user.save();
       break;
     case "BILLING.SUBSCRIPTION.SUSPENDED":
+    case "BILLING.SUBSCRIPTION.EXPIRED":
     case "PAYMENT.SALE.REVERSED":
       const guestRole = await Role.findOne({ name: "Guest" });
       if (!guestRole)

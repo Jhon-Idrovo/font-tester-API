@@ -9,5 +9,5 @@ export const clientDomainPath =
     : "http://localhost:8000";
 export const PAYPAL_API_URL =
   process.env.NODE_ENV === "production"
-    ? "https://api-m.sandbox.paypal.com"
+    ? "https://api-m.paypal.com"
     : "https://api-m.sandbox.paypal.com";
