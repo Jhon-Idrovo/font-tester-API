@@ -24,7 +24,7 @@ export async function handleWebHook(
   console.log(req.body);
   const { id, event_type, resource } = req.body as IWebhookBody;
 
-  const users = await User.find({ subscriptionId: id }).exec();
+  const users = await User.find({ subscriptionId: resource.id }).exec();
   // handle this security breach.
   if (users.length > 1) return res.send();
   // this doesn't needs to be inside of each case since not all events come here,
@@ -34,8 +34,7 @@ export async function handleWebHook(
 
   const user = users[0];
   switch (event_type) {
-    //PAYMENT.SALE.COMPLETED= A payment is made on the subscription
-    case "PAYMENT.SALE.COMPLETED":
+    case "PAYMENT.SALE.COMPLETED": // A payment is made on the subscription
     case "BILLING.SUBSCRIPTION.ACTIVATED":
       const role = await Role.findOne({ name: "User" });
       if (!role)

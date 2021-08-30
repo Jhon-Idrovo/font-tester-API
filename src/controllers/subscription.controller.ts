@@ -40,40 +40,6 @@ export async function listPlans(
   }
 }
 /**
- * DEPRECATED
- * @param req
- * @param res
- * @param next
- * @returns
- */
-export async function createSubscription(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  console.log(
-    "-----------------------CREATING SUBSCRIPTION--------------------------"
-  );
-
-  const { userID } = (req as RequestEnhanced).decodedToken;
-  const planId = req.params.planId;
-}
-/**
- * DEPRECATED
- * @param req
- * @param res
- * @param next
- * @returns
- */
-export async function activateSubscription(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const { userID } = (req as RequestEnhanced).decodedToken;
-  const subscriptionId = req.params.subscriptionId;
-}
-/**
  * Attach the subscriptionId to the user. Each subscription is unique on the db.
  * This ensures no subscription sharing.
  * @param req

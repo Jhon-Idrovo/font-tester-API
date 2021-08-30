@@ -2,10 +2,6 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth2";
 import { Strategy as TwitterStrategy } from "passport-twitter";
 import { Strategy as FacebookStrategy } from "passport-facebook";
-import User from "../models/User";
-import { basePath } from "./config";
-import mongoose from "mongoose";
-import Role from "../models/Role";
 import { getOrCreateUser } from "../utils/users";
 
 export const googleRedirectUrl = `https://font-tester-api.herokuapp.com/api/v3/auth/google`;
