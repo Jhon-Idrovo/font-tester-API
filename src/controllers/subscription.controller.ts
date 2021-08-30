@@ -65,6 +65,7 @@ export async function attachSubscription(
   user.subscriptionId = subscriptionId;
   try {
     await user.save();
+    return res.send();
   } catch (error) {
     console.log(error);
     return res.status(400).json({
