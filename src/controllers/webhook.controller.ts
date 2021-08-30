@@ -44,7 +44,6 @@ export async function handleWebHook(
       user.role = role._id;
       await user.save();
       break;
-    case "BILLING.SUBSCRIPTION.CANCELLED":
     case "BILLING.SUBSCRIPTION.SUSPENDED":
     case "PAYMENT.SALE.REVERSED":
       const guestRole = await Role.findOne({ name: "Guest" });
@@ -55,6 +54,24 @@ export async function handleWebHook(
       user.role = guestRole._id;
       await user.save();
       break;
+    case "BILLING.SUBSCRIPTION.CANCELLED":
+      // const gRole = await   Role.findOne({ name: "Guest" });
+      //  if (!gRole)
+      // return res
+      // .status(400)
+      // .json({ error: { message: 'Role "User" not found' } });
+      // user.role = gRole._id;
+
+      // Delete user
+      try {
+        await user.delete();
+        return res.send();
+      } catch (error) {
+        console.log(error);
+
+        return res.send();
+      }
+
     default:
       break;
   }
