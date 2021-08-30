@@ -133,6 +133,7 @@ export async function cancelSubscription(
     await axiosPayPal.post(
       `/v1/billing/subscriptions/${subscriptionId}/cancel`
     );
+    return res.send();
   } catch (error) {
     console.log(error);
     return res.status(400).json({
