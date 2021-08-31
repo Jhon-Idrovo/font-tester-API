@@ -33,7 +33,7 @@ passport.use(
         );
 
         //populate to avoid refetching on the next function
-        user.populate("roles", "name");
+        user.populate("role", "name");
         return cb(null, user);
       } catch (error) {
         console.log(error);
