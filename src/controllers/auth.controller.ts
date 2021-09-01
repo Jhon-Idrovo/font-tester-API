@@ -257,7 +257,7 @@ export async function handleGoogle(
         user.email,
         user.username
       );
-      console.log("redirecting");
+      console.log("redirecting", refreshToken);
 
       if (role === "Guest") {
         //redirect to complete signup
