@@ -10,7 +10,7 @@ export declare interface UserIfc {
   email: string;
   role: { name: RoleName; _id: string };
   comparePassword: Function;
-  subscriptionId?: string;
+  credits: number;
 }
 
 export declare interface UserModel extends Model<UserIfc> {

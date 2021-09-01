@@ -11,10 +11,11 @@ export function generateAccessToken(
   userID: string,
   role: RoleName,
   email: string,
-  name: string
+  name: string,
+  credits: number
 ) {
   return jwt.sign(
-    { userID, role, email, name } as TokenPayloadInterface,
+    { userID, role, email, name, credits } as TokenPayloadInterface,
     process.env.JWT_TOKEN_SECRET as Secret,
     {
       expiresIn: accessTokenLifetime,
@@ -44,10 +45,11 @@ export function generateRefreshToken(
   userID: string,
   role: RoleName,
   email: string,
-  name: string
+  name: string,
+  credits: number
 ) {
   return jwt.sign(
-    { userID, role, email, name } as TokenPayloadInterface,
+    { userID, role, email, name, credits } as TokenPayloadInterface,
     process.env.JWT_TOKEN_SECRET as Secret,
     {
       expiresIn: refreshTokenLifetime,

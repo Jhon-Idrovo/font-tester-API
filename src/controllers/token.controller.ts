@@ -47,7 +47,8 @@ export async function getAccessTokenHandler(
             user._id,
             user.role.name,
             user.email,
-            user.username
+            user.username,
+            user.credits
           ),
         });
       }

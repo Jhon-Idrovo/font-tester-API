@@ -6,6 +6,7 @@ import Fonts_User_Liked from "../models/Fonts_User_Liked";
 import Font_User_Disliked from "../models/Font_User_Disliked";
 import User from "../models/User";
 import { findOrCreateFont } from "../utils/fonts";
+import { consumeCredit } from "../utils/users";
 
 /**
  * Given a list of list of matching object fonts, save the list to the
@@ -23,7 +24,10 @@ export async function saveLikedFonts(
   // Retrieve user
   // Update: We do not need the user since we only need its id,
   // which is in the token
-  const { likedFonts }: { likedFonts: IFont[][] } = req.body;
+  const {
+    likedFonts,
+    creditAmount,
+  }: { likedFonts: IFont[][]; creditAmount: number } = req.body;
   try {
     // Find or create all involucred fonts on one asynchronous step
     const fontsPromises = likedFonts.map((matchingFonts) =>
@@ -44,6 +48,10 @@ export async function saveLikedFonts(
       })
     );
     const r = await Promise.all(fonts_userPromises);
+    const user = await User.findById(userID);
+    if (!user)
+      return res.status(400).json({ error: { message: "User not found" } });
+    await consumeCredit(user, 1);
     return res.send();
   } catch (error) {
     console.log(error);

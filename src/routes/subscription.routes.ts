@@ -4,8 +4,6 @@ import { verifyTokenMiddleware } from "../middlewares/verifyToken";
 const router = Router();
 router.get("/plans", SubscriptionCtlr.listPlans);
 router.use(verifyTokenMiddleware);
-router.get("/", SubscriptionCtlr.listSubscriptions);
-router.post("/attach", SubscriptionCtlr.attachSubscription);
 router.post("/cancel", SubscriptionCtlr.cancelSubscription);
 router.post("/update", SubscriptionCtlr.updateSubscription);
 export default router;

@@ -13,4 +13,5 @@ export declare interface TokenPayloadInterface extends JwtPayload {
   role: RoleName;
   name: string;
   email: string;
+  credits: number;
 }

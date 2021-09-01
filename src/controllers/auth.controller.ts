@@ -47,14 +47,16 @@ export async function signInHandler(
           user._id,
           userRole,
           user.email,
-          user.username
+          user.username,
+          user.credits
         );
         return res.status(200).json({
           accessToken: generateAccessToken(
             user._id,
             userRole,
             user.email,
-            user.username
+            user.username,
+            user.credits
           ),
           refreshToken,
           //this is optional, you should not rely on this to grant access to any
@@ -124,13 +126,13 @@ export async function signUpHandler(
   try {
     //we could hardcode the role's id but if it gets deleted/modified we would have a problem
     //use "Guest" until the payment is made
-    const userRole = await Role.findOne({ name: "Guest" });
+    const userRole = await Role.findOne({ name: "User" });
     const user = await new User({
       username,
       email,
       password: await User.encryptPassword(password),
       // to avoid
-      subscriptionId: email,
+      credits: 10,
       role: userRole?._id,
     }).save();
     await user.populate("role", "name -_id").execPopulate();
@@ -139,14 +141,16 @@ export async function signUpHandler(
       user._id,
       newRole,
       user.email,
-      user.username
+      user.username,
+      user.credits
     );
     return res.status(201).json({
       accessToken: generateAccessToken(
         user._id,
         newRole,
         user.email,
-        user.username
+        user.username,
+        user.credits
       ),
       refreshToken,
       user,
@@ -213,7 +217,8 @@ export async function createAdminHandler(
           admin._id,
           "Admin",
           admin.email,
-          admin.email
+          admin.email,
+          admin.credits
         ),
       });
     }
@@ -249,13 +254,15 @@ export async function handleGoogle(
         user._id,
         role,
         user.email,
-        user.username
+        user.username,
+        user.credits
       );
       const refreshToken = generateRefreshToken(
         user._id,
         role,
         user.email,
-        user.username
+        user.username,
+        user.credits
       );
       console.log("redirecting", refreshToken);
 
@@ -285,13 +292,15 @@ export async function handleFacebook(
     user._id,
     role,
     user.email,
-    user.username
+    user.username,
+    user.credits
   );
   const refreshToken = generateRefreshToken(
     user._id,
     role,
     user.email,
-    user.username
+    user.username,
+    user.credits
   );
   console.log("redirecting");
   if (role === "Guest") {
@@ -317,13 +326,15 @@ export async function handleTwitter(
     user._id,
     role,
     user.email,
-    user.username
+    user.username,
+    user.credits
   );
   const refreshToken = generateRefreshToken(
     user._id,
     role,
     user.email,
-    user.username
+    user.username,
+    user.credits
   );
   console.log("redirecting", clientDomainPath);
   if (role === "Guest") {
