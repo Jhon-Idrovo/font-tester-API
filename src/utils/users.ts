@@ -16,6 +16,8 @@ export async function getOrCreateUser(
       username,
       role,
       authMethod,
+      // to avoid duplicate key error
+      subscriptionId: email,
       password: await User.encryptPassword(password),
       authProviderId,
     });

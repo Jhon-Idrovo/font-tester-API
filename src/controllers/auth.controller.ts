@@ -128,8 +128,9 @@ export async function signUpHandler(
     const user = await new User({
       username,
       email,
-      //we don't need the await in this call but an error detects it as promise even if it is not
       password: await User.encryptPassword(password),
+      // to avoid
+      subscriptionId: email,
       role: userRole?._id,
     }).save();
     await user.populate("role", "name -_id").execPopulate();
