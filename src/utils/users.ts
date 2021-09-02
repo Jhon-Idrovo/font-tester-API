@@ -27,15 +27,15 @@ export async function getOrCreateUser(
   return user;
 }
 /**
- * Substracts the given consumeAmount from the user's credits.
+ * Adds the given consumeAmount from the user's credits.
  * @param user
- * @param consumeAmount
+ * @param creditAmount
  * @returns Promise that throws an error if the change couldn't be made.
  */
-export async function consumeCredit(
+export async function modifyCredit(
   user: UserIfc & Document<any, any, UserIfc>,
-  consumeAmount: number
+  creditAmount: number
 ) {
-  user.credits = user.credits - consumeAmount;
+  user.credits = user.credits + creditAmount;
   return user.save();
 }

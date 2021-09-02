@@ -6,7 +6,7 @@ import Fonts_User_Liked from "../models/Fonts_User_Liked";
 import Font_User_Disliked from "../models/Font_User_Disliked";
 import User from "../models/User";
 import { findOrCreateFont } from "../utils/fonts";
-import { consumeCredit } from "../utils/users";
+import { modifyCredit } from "../utils/users";
 
 /**
  * Given a list of list of matching object fonts, save the list to the
@@ -51,7 +51,7 @@ export async function saveLikedFonts(
     const user = await User.findById(userID);
     if (!user)
       return res.status(400).json({ error: { message: "User not found" } });
-    await consumeCredit(user, 1);
+    await modifyCredit(user, -1);
     return res.send();
   } catch (error) {
     console.log(error);
