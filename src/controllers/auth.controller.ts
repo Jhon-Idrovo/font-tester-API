@@ -15,6 +15,7 @@ import passport from "passport";
 import { UserIfc } from "../interfaces/users";
 import { Document } from "mongoose";
 import { clientDomainPath } from "../config/config";
+import { RequestEnhanced, ResponseError } from "../interfaces/utils";
 
 /**
  * Verifies username and password against the database. If good, returns an object
@@ -346,4 +347,32 @@ export async function handleTwitter(
   return res.redirect(
     `${clientDomainPath}/?at=${accesToken}&rt=${refreshToken}`
   );
+}
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function changePassword(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  const { newPassword } = req.body;
+  const user = await User.findById(userID);
+  if (!user)
+    return res.status(400).json({ error: { message: "User not found" } });
+  user.password = await User.encryptPassword(newPassword);
+  try {
+    await user.save();
+    return res.send();
+  } catch (error) {
+    return res
+      .status(400)
+      .json({
+        error: { message: "Unable to update", completeError: error },
+      } as ResponseError);
+  }
 }
