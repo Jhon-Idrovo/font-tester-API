@@ -30,4 +30,5 @@ router.get(
 router.use(verifyTokenMiddleware);
 router.post("/signout", AuthCtlr.signOutHandler);
 router.post("/change-password", AuthCtlr.changePassword);
+router.post("/delete-user", AuthCtlr.deleteUser);
 export default router;

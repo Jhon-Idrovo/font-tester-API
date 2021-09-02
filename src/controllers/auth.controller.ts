@@ -369,10 +369,36 @@ export async function changePassword(
     await user.save();
     return res.send();
   } catch (error) {
-    return res
-      .status(400)
-      .json({
-        error: { message: "Unable to update", completeError: error },
-      } as ResponseError);
+    console.log(error);
+
+    return res.status(400).json({
+      error: { message: "Unable to update", completeError: error },
+    } as ResponseError);
+  }
+}
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function deleteUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { userID } = (req as RequestEnhanced).decodedToken;
+  try {
+    const user = await User.findById(userID);
+    if (!user)
+      return res.status(400).json({ error: { message: "User not found" } });
+    await user.delete();
+    res.send();
+  } catch (error) {
+    console.log(error);
+
+    return res.status(400).json({
+      error: { message: "Unable to update", completeError: error },
+    } as ResponseError);
   }
 }
