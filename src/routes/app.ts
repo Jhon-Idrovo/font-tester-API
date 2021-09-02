@@ -9,8 +9,6 @@ import session from "express-session";
 import authRouter from "./auth.routes";
 import tokenRouter from "./token.routes";
 import userRouter from "./user.routes";
-import subscriptionRouter from "./subscription.routes";
-import webhookRouter from "./webhook.routes";
 import fontRouter from "./font.routes";
 import creditRouter from "./paypal.routes";
 import { basePath } from "../config/config";
@@ -37,8 +35,6 @@ app.use(passport.session());
 app.use(`${basePath}/auth`, authRouter);
 app.use(`${basePath}/tokens`, tokenRouter);
 app.use(`${basePath}/users`, userRouter);
-app.use(`${basePath}/subscriptions`, subscriptionRouter);
-app.use(`${basePath}/paypal/webhook`, webhookRouter);
 app.use(`${basePath}/fonts`, fontRouter);
 app.use(`${basePath}/credits`, creditRouter);
 
