@@ -121,15 +121,15 @@ passport.use(
     }
   )
 );
-passport.serializeUser(function (user, done) {
-  console.log(user);
+// passport.serializeUser(function (user, done) {
+//   console.log(user);
 
-  done(null, (user as UserIfc)._id);
-});
+//   done(null, (user as UserIfc)._id);
+// });
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user);
-  });
-});
+// passport.deserializeUser(function (id, done) {
+//   User.findById(id, function (err, user) {
+//     done(err, user);
+//   });
+// });
 console.log("Passport initialized");
