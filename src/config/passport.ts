@@ -3,6 +3,8 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth2";
 import { Strategy as TwitterStrategy } from "passport-twitter";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import { getOrCreateUser } from "../utils/users";
+import User from "../models/User";
+import { UserIfc } from "../interfaces/users";
 
 export const googleRedirectUrl = `https://font-tester-api.herokuapp.com/api/v3/auth/google`;
 passport.use(
@@ -119,36 +121,15 @@ passport.use(
     }
   )
 );
-console.log("Passport initialized");
+passport.serializeUser(function (user, done) {
+  console.log(user);
 
-// passport.use(
-//   new Strategy(
-//     {
-//       clientID: process.env.GOOGLE_CLIENT_ID as string,
-//       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-//       authorizationURL: "https://www.example.com/oauth2/authorize",
-//       tokenURL: "https://www.example.com/oauth2/token",
-//       callbackURL: "http://localhost:3000/auth/example/callback",
-//     },
-//     async (
-//       accessToken: string,
-//       refreshToken: string,
-//       profile,
-//       cb: Function
-//     ) => {
-//       console.log(profile);
-//       const { id, displayName } = profile;
-//       const user = await User.findById(profile.id);
-//       if (user) return user;
-//       const newUser = User.create({
-//         username: displayName,
-//         //this needs to be an ObjectId instance?
-//         _id: id,
-//         password: "",
-//         authMethod: "google",
-//         email: "",
-//         roles: "",
-//       });
-//     }
-//   )
-// );
+  done(null, (user as UserIfc)._id);
+});
+
+passport.deserializeUser(function (id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user);
+  });
+});
+console.log("Passport initialized");
