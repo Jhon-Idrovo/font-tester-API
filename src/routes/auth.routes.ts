@@ -10,6 +10,8 @@ const router = Router();
 router.post("/signin", AuthCtlr.signInHandler); //the access token is send here
 router.post("/signup", AuthCtlr.signUpHandler);
 router.post("/create-admin", AuthCtlr.createAdminHandler);
+router.post("/send-recovery-code", AuthCtlr.sendRecoveryCode);
+router.post("/verify-recovery-code", AuthCtlr.verifyRecoveryCode);
 //sign in with Google
 //scopes https://developers.google.com/identity/protocols/oauth2/scopes?authuser=1#google-sign-in
 router.get("/google", AuthCtlr.handleGoogle);

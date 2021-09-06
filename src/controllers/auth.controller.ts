@@ -16,6 +16,10 @@ import { UserIfc } from "../interfaces/users";
 import { Document } from "mongoose";
 import { clientDomainPath } from "../config/config";
 import { RequestEnhanced, ResponseError } from "../interfaces/utils";
+import RecoveryCode from "../models/RecoveryCode";
+import { generateCode } from "../utils/codes";
+import SendgridClient from "../config/send-grid";
+import { transporter } from "../config/nodemailer";
 
 /**
  * Verifies username and password against the database. If good, returns an object
@@ -79,7 +83,100 @@ export async function signInHandler(
       .json({ error: { message: (error as Error).message } });
   }
 }
+export async function sendRecoveryCode(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user)
+    return res.status(400).json({ error: { message: "User not found" } });
+  const code = generateCode();
+  try {
+    await RecoveryCode.create({
+      userId: user._id,
+      // adjusting for changes in tiezones and more
+      iat: Date.now() - 86400000,
+      code,
+    });
+    console.log(user.email);
 
+    // const a = await SendgridClient.send({
+    //   to: { name: user.username, email: user.email },
+    //   from: { email: "font.tester.app@gmail.com", name: "Font Tester" },
+    //   templateId: "a9ba698b-cd40-441a-a6a2-1a7462d9f13c",
+    //   subject: "Recovery Code",
+    //   dynamicTemplateData: { name: user.username, code },
+    // });
+    // console.log(a);
+    await transporter.sendMail({
+      from: "'Font Tester' <font.tester.app@gmail.com>",
+      to: user.email,
+      subject: "Recovery Password",
+      html:
+        '<div style="width:100%;height:100%"><h1>Font Tester</h1><p>To continue with your account recovery process, please write the following code on our site.</p><h2>' +
+        code +
+        "</h2><p>If you were not expecting this message, please verify the security of your email account.</p></div>",
+    });
+
+    return res.send();
+  } catch (error: any) {
+    console.log(error.response.body);
+
+    return res.status(400).json({
+      error: {
+        message: "Unable to generate the code, please try again later",
+      },
+    });
+  }
+}
+export async function verifyRecoveryCode(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { code, email } = req.body;
+
+  const recoveryCod = await RecoveryCode.findOne({ code });
+  if (!recoveryCod)
+    return res.status(400).json({
+      error: {
+        message:
+          "Sorry, we can't find that code, please try again or try a new code",
+      },
+    });
+  await recoveryCod
+    .populate("userId")
+    .populate({ path: "userId", populate: { path: "role" } })
+    .execPopulate();
+  console.log(recoveryCod.userId);
+  const { _id, role, email: userEmail, username, credits } = recoveryCod.userId;
+  const accessToken = generateAccessToken(
+    _id,
+    role.name,
+    userEmail,
+    username,
+    credits
+  );
+  const refreshToken = generateRefreshToken(
+    _id,
+    role.name,
+    userEmail,
+    username,
+    credits
+  );
+  if (recoveryCod.userId.email === email && recoveryCod.iat < Date.now()) {
+    recoveryCod.delete();
+    return res.json({
+      redirect: `/password-change/?at=${accessToken}&rt=${refreshToken}`,
+    });
+  }
+
+  return res.status(400).json({
+    error: { message: "Invalid code" },
+  });
+}
 /**
  * Deletes the refresh token from the database and invalidates the access token.
  * This method is optional since deleting the tokens on the client logs out
@@ -156,7 +253,7 @@ export async function signUpHandler(
       refreshToken,
       user,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.log("Error on signup process:", error);
 
     //determine the error
