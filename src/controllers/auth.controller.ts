@@ -42,6 +42,14 @@ export async function signInHandler(
     const { email, password } = req.body;
     const user = await User.findOne({ email }).populate("role").exec();
     if (user) {
+      if (user.authMethod !== "native")
+        return res
+          .status(400)
+          .json({
+            error: {
+              message: `This account is associated with a ${user.authMethod} account. Please use that login method  `,
+            },
+          });
       console.log(user);
 
       //compare passwords
@@ -230,6 +238,7 @@ export async function signUpHandler(
       email,
       password: await User.encryptPassword(password),
       // to avoid
+      authMethod: "native",
       credits: 10,
       role: userRole?._id,
     }).save();
