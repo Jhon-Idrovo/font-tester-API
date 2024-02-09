@@ -6,7 +6,7 @@ import { getOrCreateUser } from "../utils/users";
 import User from "../models/User";
 import { UserIfc } from "../interfaces/users";
 
-export const googleRedirectUrl = `https://font-tester-api.herokuapp.com/api/v3/auth/google`;
+export const googleRedirectUrl = `https://fonttester-413418.uc.r.appspot.com/api/v3/auth/google`;
 passport.use(
   new GoogleStrategy(
     {
@@ -45,7 +45,7 @@ passport.use(
     }
   )
 );
-export const facebookCbURL = `https://font-tester-api.herokuapp.com/api/v3/auth/facebook/callback`;
+export const facebookCbURL = `https://fonttester-413418.uc.r.appspot.com/api/v3/auth/facebook/callback`;
 passport.use(
   new FacebookStrategy(
     {
@@ -86,7 +86,7 @@ passport.use(
   )
 );
 
-export const twitterCbURL = `https://font-tester-api.herokuapp.com/api/v3/auth/twitter/callback`;
+export const twitterCbURL = `https://fonttester-413418.uc.r.appspot.com/api/v3/auth/twitter/callback`;
 passport.use(
   new TwitterStrategy(
     {
