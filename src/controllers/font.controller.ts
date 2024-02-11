@@ -38,6 +38,7 @@ export async function saveLikedFonts(
       )
     );
     const fonts = await Promise.all(fontsPromises);
+
     console.log(fonts);
 
     // Attach the fonts and the user with the Font_User model
