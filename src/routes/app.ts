@@ -23,7 +23,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     ? express.raw({ type: "application/json" })(req, res, next)
     : express.json()(req, res, next);
 });
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://fonttester-413418.uc.r.appspot.com",
+  })
+);
 app.use(morgan("dev"));
 //sessions
 app.use(
