@@ -29,25 +29,19 @@ export async function saveLikedFonts(
     creditAmount,
   }: { likedFonts: IFont[][]; creditAmount: number } = req.body;
   try {
-    // Find or create all involucred fonts on one asynchronous step
-    const fontsPromises = likedFonts.map((matchingFonts) =>
-      Promise.all(
-        matchingFonts.map((fontObj) =>
-          findOrCreateFont(fontObj.family, fontObj.category)
-        )
-      )
-    );
-    const fonts = await Promise.all(fontsPromises);
-
-    console.log(fonts);
-
-    // Attach the fonts and the user with the Font_User model
-    const fonts_userPromises = fonts.map((matchingFonts) =>
-      Fonts_User_Liked.create({
-        fonts_ids: matchingFonts.map((fontObj) => fontObj._id),
+    const fonts_userPromises = likedFonts.map(async (matchingFonts) => {
+      const fontDocIds: string[] = [];
+      for (const font of matchingFonts) {
+        const fontDoc = await findOrCreateFont(font.family, font.category);
+        fontDocIds.push(fontDoc.id);
+      }
+      // Attach fonts to the user
+      await Fonts_User_Liked.create({
+        fonts_ids: fontDocIds,
         user_id: userID,
-      })
-    );
+      });
+    });
+
     const r = await Promise.all(fonts_userPromises);
     const user = await User.findById(userID);
     if (!user)
