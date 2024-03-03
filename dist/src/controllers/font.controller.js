@@ -54,7 +54,8 @@ var users_1 = require("../utils/users");
  */
 function saveLikedFonts(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var userID, _a, likedFonts, creditAmount, fontsPromises, fonts, fonts_userPromises, r, user, error_1;
+        var userID, _a, likedFonts, creditAmount, fonts_userPromises, r, user, error_1;
+        var _this = this;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -62,39 +63,56 @@ function saveLikedFonts(req, res, next) {
                     _a = req.body, likedFonts = _a.likedFonts, creditAmount = _a.creditAmount;
                     _b.label = 1;
                 case 1:
-                    _b.trys.push([1, 6, , 7]);
-                    fontsPromises = likedFonts.map(function (matchingFonts) {
-                        return Promise.all(matchingFonts.map(function (fontObj) {
-                            return fonts_1.findOrCreateFont(fontObj.family, fontObj.category);
-                        }));
-                    });
-                    return [4 /*yield*/, Promise.all(fontsPromises)];
-                case 2:
-                    fonts = _b.sent();
-                    console.log(fonts);
-                    fonts_userPromises = fonts.map(function (matchingFonts) {
-                        return Fonts_User_Liked_1.default.create({
-                            fonts_ids: matchingFonts.map(function (fontObj) { return fontObj._id; }),
-                            user_id: userID,
+                    _b.trys.push([1, 5, , 6]);
+                    fonts_userPromises = likedFonts.map(function (matchingFonts) { return __awaiter(_this, void 0, void 0, function () {
+                        var fontDocIds, _i, matchingFonts_1, font, fontDoc;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    fontDocIds = [];
+                                    _i = 0, matchingFonts_1 = matchingFonts;
+                                    _a.label = 1;
+                                case 1:
+                                    if (!(_i < matchingFonts_1.length)) return [3 /*break*/, 4];
+                                    font = matchingFonts_1[_i];
+                                    return [4 /*yield*/, fonts_1.findOrCreateFont(font.family, font.category)];
+                                case 2:
+                                    fontDoc = _a.sent();
+                                    fontDocIds.push(fontDoc.id);
+                                    _a.label = 3;
+                                case 3:
+                                    _i++;
+                                    return [3 /*break*/, 1];
+                                case 4: 
+                                // Attach fonts to the user
+                                return [4 /*yield*/, Fonts_User_Liked_1.default.create({
+                                        fonts_ids: fontDocIds,
+                                        user_id: userID,
+                                    })];
+                                case 5:
+                                    // Attach fonts to the user
+                                    _a.sent();
+                                    return [2 /*return*/];
+                            }
                         });
-                    });
+                    }); });
                     return [4 /*yield*/, Promise.all(fonts_userPromises)];
-                case 3:
+                case 2:
                     r = _b.sent();
                     return [4 /*yield*/, User_1.default.findById(userID)];
-                case 4:
+                case 3:
                     user = _b.sent();
                     if (!user)
                         return [2 /*return*/, res.status(400).json({ error: { message: "User not found" } })];
                     return [4 /*yield*/, users_1.modifyCredit(user, -1)];
-                case 5:
+                case 4:
                     _b.sent();
                     return [2 /*return*/, res.send()];
-                case 6:
+                case 5:
                     error_1 = _b.sent();
                     console.log(error_1);
                     return [2 /*return*/, res.status(400).json({ error: { message: error_1.message } })];
-                case 7: return [2 /*return*/];
+                case 6: return [2 /*return*/];
             }
         });
     });

@@ -25,7 +25,11 @@ app.use(function (req, res, next) {
         ? express_1.default.raw({ type: "application/json" })(req, res, next)
         : express_1.default.json()(req, res, next);
 });
-app.use(cors_1.default());
+app.use(cors_1.default({
+    origin: process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://fonttester-413418.uc.r.appspot.com",
+}));
 app.use(morgan_1.default("dev"));
 //sessions
 app.use(express_session_1.default({ secret: "la-vaca-lola", resave: false, saveUninitialized: false }));
