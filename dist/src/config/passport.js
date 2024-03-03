@@ -45,7 +45,8 @@ var passport_google_oauth2_1 = require("passport-google-oauth2");
 var passport_twitter_1 = require("passport-twitter");
 var passport_facebook_1 = require("passport-facebook");
 var users_1 = require("../utils/users");
-exports.googleRedirectUrl = "https://fonttester-413418.uc.r.appspot.com/api/v3/auth/google";
+var constants_1 = require("../utils/constants");
+exports.googleRedirectUrl = constants_1.API_URL + "/api/v3/auth/google";
 passport_1.default.use(new passport_google_oauth2_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -79,7 +80,7 @@ passport_1.default.use(new passport_google_oauth2_1.Strategy({
         });
     });
 }));
-exports.facebookCbURL = "https://fonttester-413418.uc.r.appspot.com/api/v3/auth/facebook/callback";
+exports.facebookCbURL = constants_1.API_URL + "/api/v3/auth/facebook/callback";
 passport_1.default.use(new passport_facebook_1.Strategy({
     callbackURL: exports.facebookCbURL,
     clientID: process.env.FACEBOOK_APP_ID,
@@ -112,7 +113,7 @@ passport_1.default.use(new passport_facebook_1.Strategy({
         });
     });
 }));
-exports.twitterCbURL = "https://fonttester-413418.uc.r.appspot.com/api/v3/auth/twitter/callback";
+exports.twitterCbURL = constants_1.API_URL + "/api/v3/auth/twitter/callback";
 passport_1.default.use(new passport_twitter_1.Strategy({
     consumerKey: process.env.TWITTER_API_KEY,
     consumerSecret: process.env.TWITTER_API_SECRET,

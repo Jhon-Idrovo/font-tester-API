@@ -5,8 +5,9 @@ import { Strategy as FacebookStrategy } from "passport-facebook";
 import { getOrCreateUser } from "../utils/users";
 import User from "../models/User";
 import { UserIfc } from "../interfaces/users";
+import { API_URL } from "../utils/constants";
 
-export const googleRedirectUrl = `https://fonttester-413418.uc.r.appspot.com/api/v3/auth/google`;
+export const googleRedirectUrl = `${API_URL}/api/v3/auth/google`;
 passport.use(
   new GoogleStrategy(
     {
@@ -45,7 +46,7 @@ passport.use(
     }
   )
 );
-export const facebookCbURL = `https://fonttester-413418.uc.r.appspot.com/api/v3/auth/facebook/callback`;
+export const facebookCbURL = `${API_URL}/api/v3/auth/facebook/callback`;
 passport.use(
   new FacebookStrategy(
     {
@@ -86,7 +87,7 @@ passport.use(
   )
 );
 
-export const twitterCbURL = `https://fonttester-413418.uc.r.appspot.com/api/v3/auth/twitter/callback`;
+export const twitterCbURL = `${API_URL}/api/v3/auth/twitter/callback`;
 passport.use(
   new TwitterStrategy(
     {
