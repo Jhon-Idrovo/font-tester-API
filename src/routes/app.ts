@@ -25,7 +25,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 app.use(
   cors({
-    origin: "https://fonttester-413418.uc.r.appspot.com",
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://fonttester-413418.uc.r.appspot.com",
   })
 );
 app.use(morgan("dev"));
