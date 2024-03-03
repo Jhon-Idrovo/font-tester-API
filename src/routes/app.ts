@@ -28,7 +28,7 @@ app.use(
     origin:
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
-        : "https://fonttester-413418.uc.r.appspot.com",
+        : "https://font-tester-inky.vercel.app",
   })
 );
 app.use(morgan("dev"));
