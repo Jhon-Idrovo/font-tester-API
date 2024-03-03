@@ -28,7 +28,7 @@ app.use(function (req, res, next) {
 app.use(cors_1.default({
     origin: process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
-        : "https://fonttester-413418.uc.r.appspot.com",
+        : "https://font-tester-inky.vercel.app",
 }));
 app.use(morgan_1.default("dev"));
 //sessions
